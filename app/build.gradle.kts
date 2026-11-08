@@ -24,3 +24,9 @@ android {
         jvmTarget = "17"
     }
 }
+
+// Explicitly align every Java compile task with Kotlin's JVM 17 target.
+tasks.withType<org.gradle.api.tasks.compile.JavaCompile>().configureEach {
+    sourceCompatibility = "17"
+    targetCompatibility = "17"
+}

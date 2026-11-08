@@ -9,12 +9,16 @@ import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
+import org.json.JSONArray
+import org.json.JSONObject
 import com.google.android.material.button.MaterialButton
 import kotlin.math.*
 
 class MainActivity : Activity() {
     private lateinit var map: CityMapView
     private val activeButtons = mutableMapOf<String, MaterialButton>()
+    private lateinit var leftTools: ScrollView
+    private lateinit var rightTools: ScrollView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +61,8 @@ class MainActivity : Activity() {
         header.addView(topButton("↶", "Отменить") { map.undo() })
         header.addView(topButton("⌖", "К центру") { map.centerMap() })
         header.addView(topButton("×", "Очистить карту") { map.clearMap() })
+        header.addView(topButton("◀", "Скрыть или показать левую панель") { leftTools.visibility = if (leftTools.visibility == View.VISIBLE) View.GONE else View.VISIBLE })
+        header.addView(topButton("▶", "Скрыть или показать правую панель") { rightTools.visibility = if (rightTools.visibility == View.VISIBLE) View.GONE else View.VISIBLE })
         root.addView(header, LinearLayout.LayoutParams(-1, dp(52)))
 
         val workspace = LinearLayout(this).apply {
@@ -64,7 +70,7 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(29, 35, 35))
         }
         map = CityMapView(this)
-        workspace.addView(toolPanel("СТРОИТЕЛЬСТВО", listOf(
+        leftTools = toolPanel("СТРОИТЕЛЬСТВО", listOf(
             Triple("↗", "Улица", "street"),
             Triple("▰", "Проспект", "avenue"),
             Triple("▤", "Шоссе", "highway"),
@@ -75,16 +81,23 @@ class MainActivity : Activity() {
             Triple("□", "Фигура", "rect"),
             Triple("○", "Круг", "circle"),
             Triple("△", "Треуг.", "triangle"),
-            Triple("⬡", "Полигон", "polygon"),
-            Triple("✥", "Панорама", "pan")
-        )), LinearLayout.LayoutParams(dp(78), -1))
+            Triple("⬡", "Полигон", "polygon")
+        ))
+        workspace.addView(leftTools, LinearLayout.LayoutParams(dp(78), -1))
         workspace.addView(map, LinearLayout.LayoutParams(0, -1, 1f))
-        workspace.addView(toolPanel("МИР И ОБЪЕКТЫ", listOf(
+        rightTools = toolPanel("МИР И ОБЪЕКТЫ", listOf(
             Triple("⌂", "Дом", "house"),
             Triple("▦", "Квартал", "block"),
             Triple("▥", "Завод", "factory"),
             Triple("▧", "Паркинг", "parking"),
+            Triple("▣", "Офис", "office"),
+            Triple("▤", "Магазин", "shop"),
+            Triple("✚", "Больница", "hospital"),
+            Triple("▧", "Школа", "school"),
+            Triple("▩", "Склад", "warehouse"),
             Triple("♣", "Дерево", "tree"),
+            Triple("♧", "Парк", "park"),
+            Triple("▱", "Площадь", "plaza"),
             Triple("⌫", "Ластик", "erase"),
             Triple("砂", "Пустыня", "desert"),
             Triple("♧", "Степь", "steppe"),
@@ -96,9 +109,11 @@ class MainActivity : Activity() {
             Triple("◫", "Рельеф", "layer_terrain"),
             Triple("−", "Уменьшить", "zoom_out"),
             Triple("+", "Увеличить", "zoom_in")
-        )), LinearLayout.LayoutParams(dp(78), -1))
+        ))
+        workspace.addView(rightTools, LinearLayout.LayoutParams(dp(78), -1))
         root.addView(workspace, LinearLayout.LayoutParams(-1, 0, 1f))
         setContentView(root)
+        map.loadWorld()
     }
 
     private fun dp(v: Int) = (v * resources.displayMetrics.density + .5f).toInt()
@@ -241,8 +256,43 @@ private class CityMapView(context: android.content.Context) : View(context) {
         val r = zoom/old; ox = width/2f-(width/2f-ox)*r; oy = height/2f-(height/2f-oy)*r
         invalidate()
     }
-    fun undo() { if (active != null) active=null else if(items.isNotEmpty()) items.removeAt(items.lastIndex) else if(strokes.isNotEmpty()) strokes.removeAt(strokes.lastIndex); invalidate() }
-    fun clearMap() { strokes.clear(); items.clear(); active=null; invalidate() }
+    fun undo() { if (active != null) active=null else if(items.isNotEmpty()) items.removeAt(items.lastIndex) else if(strokes.isNotEmpty()) strokes.removeAt(strokes.lastIndex); saveWorld(); invalidate() }
+    fun clearMap() { strokes.clear(); items.clear(); active=null; saveWorld(); invalidate() }
+
+    fun saveWorld() {
+        try {
+            val root = JSONObject()
+            val strokeArray = JSONArray()
+            strokes.forEach { stroke ->
+                val obj = JSONObject().put("kind", stroke.kind)
+                val pts = JSONArray()
+                stroke.points.forEach { pts.put(JSONObject().put("x", it.x.toDouble()).put("y", it.y.toDouble())) }
+                obj.put("points", pts); strokeArray.put(obj)
+            }
+            val itemArray = JSONArray()
+            items.forEach { itemArray.put(JSONObject().put("x", item.x.toDouble()).put("y", item.y.toDouble()).put("kind", item.kind).put("w", item.w.toDouble()).put("h", item.h.toDouble())) }
+            root.put("strokes", strokeArray).put("items", itemArray)
+            context.getSharedPreferences("city_sandbox_world", android.content.Context.MODE_PRIVATE).edit().putString("world", root.toString()).apply()
+        } catch (_: Exception) { }
+    }
+
+    fun loadWorld() {
+        try {
+            val raw = context.getSharedPreferences("city_sandbox_world", android.content.Context.MODE_PRIVATE).getString("world", null) ?: return
+            val root = JSONObject(raw)
+            strokes.clear(); items.clear()
+            val sa = root.optJSONArray("strokes") ?: JSONArray()
+            for (i in 0 until sa.length()) {
+                val obj = sa.getJSONObject(i); val pts = obj.optJSONArray("points") ?: JSONArray()
+                val list = mutableListOf<PointF>()
+                for (j in 0 until pts.length()) { val q=pts.getJSONObject(j); list.add(PointF(q.optDouble("x").toFloat(), q.optDouble("y").toFloat())) }
+                strokes.add(Stroke(list, obj.optString("kind", "street")))
+            }
+            val ia = root.optJSONArray("items") ?: JSONArray()
+            for (i in 0 until ia.length()) { val q=ia.getJSONObject(i); items.add(Item(q.optDouble("x").toFloat(), q.optDouble("y").toFloat(), q.optString("kind", "house"), q.optDouble("w").toFloat(), q.optDouble("h").toFloat())) }
+            invalidate()
+        } catch (_: Exception) { }
+    }
 
     override fun onDraw(c: Canvas) {
         super.onDraw(c)
@@ -376,6 +426,14 @@ private class CityMapView(context: android.content.Context) : View(context) {
 
     private fun drawItem(c:Canvas,o:Item) {
         val x=o.x; val y=o.y
+        if(o.kind=="park" || o.kind=="plaza") {
+            val ground = if(o.kind=="park") 0xff668451.toInt() else 0xffb8b19b.toInt()
+            c.drawRoundRect(x-50,y-44,x+50,y+44,8f,8f,p(0xff4b5546.toInt()))
+            c.drawRoundRect(x-46,y-40,x+46,y+40,6f,6f,p(ground))
+            if(o.kind=="park") { for(dx in listOf(-27f,27f)) for(dy in listOf(-18f,18f)) { c.drawCircle(x+dx,y+dy,12f,p(0xff315d38.toInt())); c.drawCircle(x+dx-3,y+dy-4,5f,p(0xff6f9258.toInt())) } }
+            else { c.drawCircle(x,y,12f,p(0xff7b9a9b.toInt())); c.drawCircle(x,y,6f,p(0xffcbd4c6.toInt())) }
+            return
+        }
         if(o.kind=="tree") {
             // Layered canopy with trunk, highlights and soft contact shadow.
             c.drawOval(x-25,y+5,x+28,y+26,p(0x66302b20))
@@ -403,7 +461,12 @@ private class CityMapView(context: android.content.Context) : View(context) {
             val stripe=p(0xffe8e3d1.toInt(),Paint.Style.STROKE).apply { strokeWidth=2f }
             for(i in -3..3) c.drawLine(x+i*10,y-h/2+10,x+i*10,y+h/2-9,stripe)
             c.drawRect(x-17,y-9,x+17,y+9,p(0xff5f6869.toInt()))
-        } else if(o.kind=="factory") {
+        } else if(o.kind=="hospital" || o.kind=="school") {
+            val sign = if(o.kind=="hospital") "+" else "S"
+            c.drawRect(x-12,y-18,x+12,y-12,p(0xfff4f1e5.toInt()))
+            c.drawRect(x-4,y-22,x+4,y-8,p(0xffb94f48.toInt()))
+            c.drawText(sign,x+22,y-18,p(Color.WHITE).apply { textSize=13f; typeface=Typeface.DEFAULT_BOLD })
+        } else if(o.kind=="factory" || o.kind=="warehouse") {
             c.drawRect(x-17,y-14,x+18,y+14,p(0xff777c76.toInt()))
             c.drawRect(x+26,y-47,x+36,y-10,p(0xff77736a.toInt()))
             c.drawRect(x-37,y-34,x-27,y-10,p(0xff77736a.toInt()))
@@ -451,13 +514,13 @@ private class CityMapView(context: android.content.Context) : View(context) {
                 lastX=e.x; lastY=e.y
                 if(tool=="pan") return true
                 val w=world(e.x,e.y)
-                if(tool=="interchange") { drawInterchange(w.x,w.y); invalidate(); return true }
+                if(tool=="interchange") { drawInterchange(w.x,w.y); saveWorld(); invalidate(); return true }
                 if(tool=="roundabout") {
                     strokes.add(Stroke(mutableListOf(PointF(w.x-130,w.y),PointF(w.x-80,w.y-45),PointF(w.x+80,w.y-45),PointF(w.x+130,w.y),PointF(w.x+80,w.y+45),PointF(w.x-80,w.y+45),PointF(w.x-130,w.y)),"avenue"))
-                    items.add(Item(w.x,w.y,"tree")); invalidate(); return true
+                    items.add(Item(w.x,w.y,"tree")); saveWorld(); invalidate(); return true
                 }
-                if(tool in listOf("house","block","factory","parking","tree")) { items.add(Item(w.x,w.y,tool)); invalidate(); return true }
-                if(tool=="erase") { erase(w.x,w.y); return true }
+                if(tool in listOf("house","block","factory","parking","office","shop","hospital","school","warehouse","tree","park","plaza")) { items.add(Item(w.x,w.y,tool)); saveWorld(); invalidate(); return true }
+                if(tool=="erase") { erase(w.x,w.y); saveWorld(); return true }
                 if(tool in listOf("rect","circle","triangle","polygon")) { shapeStart=w; preview=RectF(w.x,w.y,w.x,w.y); return true }
                 if(tool in ROADS || tool=="terrain") { active=Stroke(mutableListOf(w),if(tool=="terrain") terrain else tool); invalidate() }
                 return true
@@ -479,7 +542,7 @@ private class CityMapView(context: android.content.Context) : View(context) {
                     val q=world(e.x,e.y); val points=mutableListOf(start, q)
                     strokes.add(Stroke(points,tool))
                 }
-                shapeStart=null; preview=null; performClick(); invalidate(); return true
+                shapeStart=null; preview=null; saveWorld(); performClick(); invalidate(); return true
             }
         }
         return true

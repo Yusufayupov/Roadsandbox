@@ -8,115 +8,174 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.WindowManager
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
 import android.widget.*
 import com.google.android.material.button.MaterialButton
 import kotlin.math.*
 
 class MainActivity : Activity() {
     private lateinit var map: CityMapView
-    private val selected = mutableMapOf<String, MaterialButton>()
+    private val activeButtons = mutableMapOf<String, MaterialButton>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = Color.rgb(24, 29, 30)
-        window.navigationBarColor = Color.rgb(24, 29, 30)
+        window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility = 0
+        window.statusBarColor = Color.rgb(20, 26, 27)
+        window.navigationBarColor = Color.rgb(20, 26, 27)
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.rgb(28, 33, 34))
+            setBackgroundColor(Color.rgb(24, 30, 31))
+            fitsSystemWindows = true
         }
         val header = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            setPadding(10, 3, 8, 3)
-            setBackgroundColor(Color.rgb(24, 29, 30))
+            setPadding(dp(10), 0, dp(8), 0)
+            setBackgroundColor(Color.rgb(20, 26, 27))
         }
-        val title = TextView(this).apply {
-            text = "ROAD SANDBOX  •  CITY BUILDER"
-            textSize = 14f
+        val brand = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        brand.addView(TextView(this).apply {
+            text = "POCKET CITY SANDBOX"
+            textSize = 13f
+            letterSpacing = .08f
             setTextColor(Color.WHITE)
             typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD)
-            letterSpacing = .06f
+        })
+        brand.addView(TextView(this).apply {
+            text = "WORLD BUILDER  •  2D EDITOR"
+            textSize = 8f
+            letterSpacing = .12f
+            setTextColor(Color.rgb(151, 172, 157))
+        })
+        header.addView(brand, LinearLayout.LayoutParams(0, dp(48), 1f))
+        header.addView(topButton("↶", "Отменить") { map.undo() })
+        header.addView(topButton("⌖", "К центру") { map.centerMap() })
+        header.addView(topButton("×", "Очистить карту") { map.clearMap() })
+        root.addView(header, LinearLayout.LayoutParams(-1, dp(52)))
+
+        val workspace = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            setBackgroundColor(Color.rgb(29, 35, 35))
         }
-        header.addView(title, LinearLayout.LayoutParams(0, 48, 1f))
-        header.addView(button("↶", "Отменить") { map.undo() })
-        header.addView(button("Сброс", "Очистить проект") { map.clearMap() })
-        root.addView(header)
         map = CityMapView(this)
-        root.addView(map, LinearLayout.LayoutParams(-1, 0, 1f))
-        root.addView(section("ДОРОЖНАЯ СЕТЬ", listOf(
-            "Улица" to "street", "Проспект" to "avenue", "Автомагистраль" to "highway",
-            "Съезд" to "ramp", "Мост" to "bridge", "Развязка" to "interchange", "Кольцо" to "roundabout"
-        )))
-        root.addView(section("ФИГУРЫ И ОБЪЕКТЫ", listOf(
-            "Прямоуг." to "rect", "Круг" to "circle", "Треуг." to "triangle", "Многоуг." to "polygon",
-            "Дом" to "house", "Квартал" to "block", "Завод" to "factory", "Парковка" to "parking",
-            "Дерево" to "tree", "Ластик" to "erase", "Панорама" to "pan"
-        )))
-        root.addView(section("ЛАНДШАФТ", listOf(
-            "Пустыня" to "desert", "Степь" to "steppe", "Лес" to "forest",
-            "Горы" to "rock", "Вода" to "water", "Поля" to "field"
-        )))
-        root.addView(section("СЛОИ И МАСШТАБ", listOf(
-            "Спутник" to "layer_satellite", "Рельеф" to "layer_terrain",
-            "Дороги" to "layer_roads", "Здания" to "layer_buildings",
-            "Природа" to "layer_nature", "−" to "zoom_out", "+" to "zoom_in"
-        )))
+        workspace.addView(toolPanel("СТРОИТЕЛЬСТВО", listOf(
+            Triple("↗", "Улица", "street"),
+            Triple("▰", "Проспект", "avenue"),
+            Triple("▤", "Шоссе", "highway"),
+            Triple("⌁", "Съезд", "ramp"),
+            Triple("▥", "Мост", "bridge"),
+            Triple("✣", "Развязка", "interchange"),
+            Triple("◉", "Кольцо", "roundabout"),
+            Triple("□", "Фигура", "rect"),
+            Triple("○", "Круг", "circle"),
+            Triple("△", "Треуг.", "triangle"),
+            Triple("⬡", "Полигон", "polygon"),
+            Triple("✥", "Панорама", "pan")
+        )), LinearLayout.LayoutParams(dp(78), -1))
+        workspace.addView(map, LinearLayout.LayoutParams(0, -1, 1f))
+        workspace.addView(toolPanel("МИР И ОБЪЕКТЫ", listOf(
+            Triple("⌂", "Дом", "house"),
+            Triple("▦", "Квартал", "block"),
+            Triple("▥", "Завод", "factory"),
+            Triple("▧", "Паркинг", "parking"),
+            Triple("♣", "Дерево", "tree"),
+            Triple("⌫", "Ластик", "erase"),
+            Triple("砂", "Пустыня", "desert"),
+            Triple("♧", "Степь", "steppe"),
+            Triple("♠", "Лес", "forest"),
+            Triple("▲", "Горы", "rock"),
+            Triple("≈", "Вода", "water"),
+            Triple("▨", "Поля", "field"),
+            Triple("◩", "Спутник", "layer_satellite"),
+            Triple("◫", "Рельеф", "layer_terrain"),
+            Triple("−", "Уменьшить", "zoom_out"),
+            Triple("+", "Увеличить", "zoom_in")
+        )), LinearLayout.LayoutParams(dp(78), -1))
+        root.addView(workspace, LinearLayout.LayoutParams(-1, 0, 1f))
         setContentView(root)
     }
 
-    private fun button(label: String, desc: String, action: () -> Unit): MaterialButton {
-        return MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+    private fun dp(v: Int) = (v * resources.displayMetrics.density + .5f).toInt()
+
+    private fun topButton(label: String, hint: String, action: () -> Unit) =
+        MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
             text = label
-            contentDescription = desc
-            textSize = 10f
+            contentDescription = hint
+            textSize = 16f
             isAllCaps = false
-            insetTop = 1
-            insetBottom = 1
-            cornerRadius = 10
-            minimumHeight = 38
-            setPadding(10, 0, 10, 0)
+            minWidth = dp(40)
+            minimumWidth = dp(40)
+            minimumHeight = dp(38)
+            insetTop = 0
+            insetBottom = 0
+            cornerRadius = dp(9)
+            setPadding(dp(4), 0, dp(4), 0)
             setOnClickListener { action() }
         }
-    }
 
-    private fun section(name: String, tools: List<Pair<String, String>>): HorizontalScrollView {
-        val wrap = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(39, 45, 45)) }
-        val label = TextView(this).apply {
-            text = name
-            textSize = 9f
-            letterSpacing = .12f
-            setTextColor(Color.rgb(166, 184, 173))
-            setPadding(10, 5, 5, 0)
+    private fun toolPanel(title: String, entries: List<Triple<String, String, String>>): ScrollView {
+        val panel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+            setPadding(dp(3), dp(5), dp(3), dp(8))
+            setBackgroundColor(Color.rgb(35, 43, 43))
         }
-        wrap.addView(label)
-        val row = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            setPadding(4, 0, 4, 3)
-        }
-        tools.forEach { (caption, key) ->
+        panel.addView(TextView(this).apply {
+            text = title
+            textSize = 7f
+            letterSpacing = .05f
+            gravity = Gravity.CENTER
+            setTextColor(Color.rgb(156, 178, 162))
+            setPadding(0, dp(3), 0, dp(6))
+        })
+        entries.forEach { (glyph, caption, key) ->
             lateinit var b: MaterialButton
-            b = button(caption, caption) {
-                when {
-                    key.startsWith("layer_") -> map.toggleLayer(key.removePrefix("layer_"))
-                    key == "zoom_in" -> map.zoomBy(1.25f)
-                    key == "zoom_out" -> map.zoomBy(.8f)
-                    else -> map.setTool(key)
-                }
-                selected.values.forEach { it.alpha = .78f }
-                if (!key.startsWith("layer_") && !key.startsWith("zoom_")) {
-                    selected[key] = b
-                    b.alpha = 1f
+            b = MaterialButton(this, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
+                text = "$glyph\n$caption"
+                contentDescription = caption
+                textSize = 8f
+                isAllCaps = false
+                gravity = Gravity.CENTER
+                maxLines = 2
+                minWidth = 0
+                minimumWidth = 0
+                minimumHeight = dp(48)
+                insetTop = 0
+                insetBottom = 0
+                cornerRadius = dp(8)
+                setPadding(dp(1), dp(2), dp(1), dp(2))
+                setTextColor(Color.rgb(232, 235, 224))
+                strokeWidth = dp(1)
+                strokeColor = android.content.res.ColorStateList.valueOf(Color.rgb(73, 88, 80))
+                backgroundTintList = android.content.res.ColorStateList.valueOf(Color.rgb(45, 55, 53))
+                setOnClickListener {
+                    when {
+                        key.startsWith("layer_") -> map.toggleLayer(key.removePrefix("layer_"))
+                        key == "zoom_in" -> map.zoomBy(1.25f)
+                        key == "zoom_out" -> map.zoomBy(.8f)
+                        else -> map.setTool(key)
+                    }
+                    activeButtons.values.forEach {
+                        it.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.rgb(45, 55, 53))
+                    }
+                    if (!key.startsWith("layer_") && !key.startsWith("zoom_")) {
+                        activeButtons[key] = b
+                        b.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.rgb(89, 119, 91))
+                    }
                 }
             }
-            row.addView(b, LinearLayout.LayoutParams(-2, 39).apply { setMargins(2, 2, 2, 1) })
+            panel.addView(b, LinearLayout.LayoutParams(-1, dp(51)).apply { bottomMargin = dp(4) })
         }
-        wrap.addView(row)
-        return HorizontalScrollView(this).apply {
-            isHorizontalScrollBarEnabled = false
-            addView(wrap)
+        return ScrollView(this).apply {
+            isVerticalScrollBarEnabled = false
+            clipToPadding = false
+            addView(panel)
         }
     }
 }

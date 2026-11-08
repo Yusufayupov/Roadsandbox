@@ -319,25 +319,30 @@ private class CityMapView(context: android.content.Context) : View(context) {
 
     private fun hash(x:Int,y:Int):Float { val n=sin(x*127.1+y*311.7)*43758.5453; return (n-floor(n)).toFloat() }
     private fun drawSatellite(c:Canvas,l:Float,t:Float,r:Float,b:Float) {
-        c.drawColor(Color.rgb(145,148,111))
-        val cell=128f
-        for(y in floor(t/cell).toInt()..floor(b/cell).toInt()) for(x in floor(l/cell).toInt()..floor(r/cell).toInt()) {
-            val h=hash(x,y); val col=when { h<.18f->0xff777d54.toInt(); h<.38f->0xffa49b70.toInt(); h<.61f->0xff858f62.toInt(); h<.8f->0xffb1a77b.toInt(); else->0xff6d8058.toInt() }
-            val xx=x*cell; val yy=y*cell
-            c.drawRect(xx,yy,xx+cell+1,yy+cell+1,p(col))
-            for(i in 0..8) {
-                val px=xx+hash(x*17+i,y*13)*cell; val py=yy+hash(x*7,y*19+i)*cell
-                c.drawOval(px,py,px+12+hash(i,x)*34,py+8+hash(y,i)*25,p(Color.argb(35,47,55,35)))
+        // Seamless aerial ground: organic land-cover patches, no visible square tile grid.
+        c.drawColor(0xff929873.toInt())
+        val cell=310f
+        for(gy in floor(t/cell).toInt()-1..floor(b/cell).toInt()+1) for(gx in floor(l/cell).toInt()-1..floor(r/cell).toInt()+1) {
+            val x=gx*cell; val y=gy*cell; val h=hash(gx,gy)
+            for(k in 0..11) {
+                val px=x+hash(gx*17+k,gy*13)*cell
+                val py=y+hash(gx*7,gy*19+k)*cell
+                val rad=42f+hash(gx+k,gy-k)*100f
+                val tone=when((k+gx+gy).mod(5)) { 0->0xff6f8056.toInt(); 1->0xffb4a678.toInt(); 2->0xff89936a.toInt(); 3->0xff9da078.toInt(); else->0xff78865c.toInt() }
+                c.drawCircle(px,py,rad,p(tone).apply { alpha=if(k%2==0) 58 else 34 })
             }
-            if(h>.72f) {
-                val field=p(Color.argb(35,224,211,159),Paint.Style.STROKE).apply { strokeWidth=1.4f }
-                c.drawRect(xx+12,yy+12,xx+cell-10,yy+cell-10,field)
+            if(h>.38f) {
+                val q=Path().apply { moveTo(x+24,y+42); lineTo(x+cell*.58f,y+18); lineTo(x+cell-18,y+cell*.31f); lineTo(x+cell*.82f,y+cell-26); lineTo(x+cell*.27f,y+cell-10); close() }
+                c.drawPath(q,p(Color.argb(22,224,211,157)))
+                c.drawPath(q,p(Color.argb(38,76,75,48),Paint.Style.STROKE).apply { strokeWidth=1.2f })
             }
-        }
-        val fine=48f
-        for(y in floor(t/fine).toInt()..floor(b/fine).toInt()) for(x in floor(l/fine).toInt()..floor(r/fine).toInt()) {
-            val h=hash(x+331,y-91)
-            if(h>.74f) c.drawCircle(x*fine+20,y*fine+18,3+h*7,p(Color.argb(48,48,65,40)))
+            for(k in 0..13) {
+                val px=x+hash(gx*31+k,gy*11)*cell; val py=y+hash(gx*9,gy*29+k)*cell
+                val rad=4f+hash(k+gx,gy+k)*7f
+                c.drawCircle(px+2,py+3,rad+2,p(Color.argb(38,28,37,24)))
+                c.drawCircle(px,py,rad,p(when(k%3){0->0xff526b43.toInt();1->0xff64774a.toInt();else->0xff788452.toInt()}).apply { alpha=190 })
+                c.drawCircle(px-2,py-2,rad*.4f,p(0x557f9860))
+            }
         }
     }
 
@@ -428,62 +433,79 @@ private class CityMapView(context: android.content.Context) : View(context) {
     private fun drawItem(c:Canvas,o:Item) {
         val x=o.x; val y=o.y
         if(o.kind=="park" || o.kind=="plaza") {
-            val ground = if(o.kind=="park") 0xff668451.toInt() else 0xffb8b19b.toInt()
-            c.drawRoundRect(x-50,y-44,x+50,y+44,8f,8f,p(0xff4b5546.toInt()))
-            c.drawRoundRect(x-46,y-40,x+46,y+40,6f,6f,p(ground))
-            if(o.kind=="park") { for(dx in listOf(-27f,27f)) for(dy in listOf(-18f,18f)) { c.drawCircle(x+dx,y+dy,12f,p(0xff315d38.toInt())); c.drawCircle(x+dx-3,y+dy-4,5f,p(0xff6f9258.toInt())) } }
-            else { c.drawCircle(x,y,12f,p(0xff7b9a9b.toInt())); c.drawCircle(x,y,6f,p(0xffcbd4c6.toInt())) }
+            val green=o.kind=="park"
+            c.drawRoundRect(x-58,y-49,x+60,y+51,13f,13f,p(0x55302b20))
+            c.drawRoundRect(x-55,y-52,x+55,y+46,11f,11f,p(if(green)0xff71865b.toInt() else 0xffb9b19c.toInt()))
+            if(green) {
+                for(i in 0..10) {
+                    val px=x-39+hash(i+o.x.toInt(),o.y.toInt())*78
+                    val py=y-34+hash(i+o.y.toInt(),o.x.toInt())*65
+                    c.drawCircle(px+2,py+4,10f,p(0x55302b20))
+                    c.drawCircle(px,py,9f,p(when(i%3){0->0xff315a36.toInt();1->0xff477348.toInt();else->0xff63834b.toInt()}))
+                    c.drawCircle(px-3,py-3,3f,p(0xff91a66a.toInt()))
+                }
+                c.drawRoundRect(x-4,y-43,x+4,y+38,3f,3f,p(0xffc6b98e.toInt()))
+                c.drawRoundRect(x-46,y-4,x+46,y+3,3f,3f,p(0xffc6b98e.toInt()))
+            } else {
+                c.drawRoundRect(x-38,y-4,x+38,y+4,3f,3f,p(0xff8d887b.toInt()))
+                c.drawRoundRect(x-4,y-34,x+4,y+34,3f,3f,p(0xff8d887b.toInt()))
+                c.drawCircle(x,y,13f,p(0xff7b9a9b.toInt())); c.drawCircle(x,y,7f,p(0xffd3d7c7.toInt()))
+            }
             return
         }
         if(o.kind=="tree") {
-            // Layered canopy with trunk, highlights and soft contact shadow.
-            c.drawOval(x-25,y+5,x+28,y+26,p(0x66302b20))
-            c.drawRect(x-3,y-3,x+3,y+20,p(0xff76563a.toInt()))
-            c.drawCircle(x,y-8,22f,p(0xff244d31.toInt()))
-            c.drawCircle(x-9,y-14,14f,p(0xff477849.toInt()))
-            c.drawCircle(x+9,y-5,13f,p(0xff356b3d.toInt()))
-            c.drawCircle(x-4,y-19,6f,p(0xff71915a.toInt()))
-            c.drawCircle(x+11,y-12,4f,p(0x667fa56a))
+            c.drawOval(x-20,y+4,x+23,y+18,p(0x55302b20))
+            c.drawCircle(x,y,17f,p(0xff294c30.toInt()))
+            c.drawCircle(x-7,y-6,11f,p(0xff47764a.toInt()))
+            c.drawCircle(x+7,y+2,10f,p(0xff35663d.toInt()))
+            c.drawCircle(x-3,y-10,4f,p(0xff829b61.toInt()))
             return
         }
-        val w=when(o.kind) { "block"->82f; "factory"->100f; "parking"->92f; "hospital","school","warehouse","office"->88f; "shop"->66f; else->58f }
-        val h=when(o.kind) { "block"->70f; "factory"->78f; "parking"->64f; "hospital","school","warehouse","office"->72f; "shop"->58f; else->52f }
-        val wall=when(o.kind) { "factory","warehouse"->0xff777b74.toInt(); "block"->0xff8c877b.toInt(); "hospital"->0xffd4d4c9.toInt(); "school"->0xffb99b68.toInt(); "office"->0xff687c80.toInt(); "shop"->0xffa77c58.toInt(); else->0xffa18a70.toInt() }
-        val roof=when(o.kind) { "factory","warehouse"->0xffa9aaa1.toInt(); "block"->0xffb9b3a5.toInt(); "parking"->0xff7e8888.toInt(); "hospital"->0xffe9e8df.toInt(); "school"->0xffd5b978.toInt(); "office"->0xff9db5b9.toInt(); "shop"->0xffd6a77c.toInt(); else->0xffc9a783.toInt() }
-        // Isometric-style extruded walls and roof, similar to miniature city builders.
-        val side=Path().apply { moveTo(x-w/2,y-h/2); lineTo(x-w/2+9,y-h/2+7); lineTo(x-w/2+9,y+h/2+7); lineTo(x-w/2,y+h/2); close() }
-        c.drawPath(side,p(0xff555951.toInt()))
-        val front=Path().apply { moveTo(x-w/2,y+h/2); lineTo(x-w/2+9,y+h/2+7); lineTo(x+w/2+9,y+h/2+7); lineTo(x+w/2,y+h/2); close() }
-        c.drawPath(front,p(wall))
-        c.drawRect(x-w/2,y-h/2,x+w/2,y+h/2,p(wall))
-        c.drawRect(x-w/2+4,y-h/2+4,x+w/2-4,y+h/2-4,p(roof))
-        c.drawRect(x-w/2+4,y-h/2+4,x+w/2-4,y-h/2+8,p(Color.argb(60,255,255,255)))
-        if(o.kind=="parking") {
-            val stripe=p(0xffe8e3d1.toInt(),Paint.Style.STROKE).apply { strokeWidth=2f }
-            for(i in -3..3) c.drawLine(x+i*10,y-h/2+10,x+i*10,y+h/2-9,stripe)
-            c.drawRect(x-17,y-9,x+17,y+9,p(0xff5f6869.toInt()))
-        } else if(o.kind=="hospital" || o.kind=="school") {
-            val sign = if(o.kind=="hospital") "+" else "S"
-            c.drawRect(x-12,y-18,x+12,y-12,p(0xfff4f1e5.toInt()))
-            c.drawRect(x-4,y-22,x+4,y-8,p(0xffb94f48.toInt()))
-            c.drawText(sign,x+22,y-18,p(Color.WHITE).apply { textSize=13f; typeface=Typeface.DEFAULT_BOLD })
-        } else if(o.kind=="factory" || o.kind=="warehouse") {
-            c.drawRect(x-17,y-14,x+18,y+14,p(0xff777c76.toInt()))
-            c.drawRect(x+26,y-47,x+36,y-10,p(0xff77736a.toInt()))
-            c.drawRect(x-37,y-34,x-27,y-10,p(0xff77736a.toInt()))
-            c.drawOval(x+24,y-54,x+39,y-42,p(0x447c8580))
+        val w=when(o.kind) { "block"->96f; "factory","warehouse"->112f; "parking"->98f; "hospital","school","office"->94f; "shop"->72f; else->58f }
+        val h=when(o.kind) { "block"->84f; "factory","warehouse"->86f; "parking"->72f; "hospital","school","office"->78f; "shop"->62f; else->54f }
+        // Property apron, contact shadow and overhead roof footprint.
+        c.drawRoundRect(x-w/2-10,y-h/2-10,x+w/2+12,y+h/2+13,7f,7f,p(0x442b3026))
+        c.drawRoundRect(x-w/2-9,y-h/2-9,x+w/2+9,y+h/2+9,6f,6f,p(when(o.kind){"factory","warehouse"->0xff999a8d.toInt();"house"->0xffa4a07e.toInt();else->0xffb3ad94.toInt()}))
+        val roof=when(o.kind) {
+            "factory","warehouse"->0xffa5a69d.toInt(); "block"->0xffb8b4a7.toInt()
+            "hospital"->0xffe4e2d8.toInt(); "school"->0xffc9b27f.toInt()
+            "office"->0xff71898b.toInt(); "shop"->0xffbd8b65.toInt()
+            "house"->0xff985e49.toInt(); else->0xffc6b89a.toInt()
+        }
+        c.drawRoundRect(RectF(x-w/2,y-h/2,x+w/2,y+h/2),3f,3f,p(0xff5b5a4e.toInt()))
+        c.drawRoundRect(RectF(x-w/2+3,y-h/2+3,x+w/2-3,y+h/2-3),2f,2f,p(roof))
+        c.drawRoundRect(RectF(x-w/2+7,y-h/2+7,x+w/2-7,y+h/2-7),2f,2f,p(Color.argb(32,255,255,255),Paint.Style.STROKE).apply { strokeWidth=2f })
+        if(o.kind=="house") {
+            c.drawLine(x-w/2+8,y,x+w/2-8,y,p(0xff633e34.toInt()).apply { strokeWidth=3f })
+            for(k in -2..2) c.drawLine(x-w/2+8,y+k*8,x+w/2-8,y+k*8,p(0x55723e32).apply { strokeWidth=1.4f })
+            c.drawRect(x-5,y+8,x+5,y+h/2-5,p(0xff55483b.toInt()))
         } else {
-            val win=p(0xff526b6b.toInt())
-            for(i in -1..1) for(j in -1..1) {
-                c.drawRect(x+i*14-4,y+j*12-4,x+i*14+4,y+j*12+4,win)
-                c.drawRect(x+i*14-4,y+j*12-4,x+i*14+4,y+j*12-2,p(0xffa8b6a8.toInt()))
+            val unit=p(0xff68716c.toInt()); val highlight=p(0xffc4c7ba.toInt(),Paint.Style.STROKE).apply { strokeWidth=1.2f }
+            for(k in 0..2) {
+                val px=x-w/2+17+k*19
+                c.drawRoundRect(px,y-h/2+13,px+11,y-h/2+23,2f,2f,unit)
+                c.drawRect(px+2,y-h/2+15,px+9,y-h/2+21,highlight)
             }
-            if(o.kind=="house") {
-                val roofPath=Path().apply { moveTo(x-w/2+3,y-h/2+3); lineTo(x,y-h/2-12); lineTo(x+w/2-3,y-h/2+3); close() }
-                c.drawPath(roofPath,p(0xff985f49.toInt()))
+            if(o.kind=="factory" || o.kind=="warehouse") {
+                c.drawRoundRect(x-20,y-12,x+22,y+13,3f,3f,p(0xff7d8178.toInt()))
+                c.drawLine(x-15,y-7,x+17,y-7,p(0xffc5c6ba.toInt()).apply { strokeWidth=2f })
+            }
+            if(o.kind=="parking") {
+                val stripe=p(0xffe8e2ce.toInt(),Paint.Style.STROKE).apply { strokeWidth=2f }
+                for(i in -3..3) c.drawLine(x+i*11,y-h/2+10,x+i*11,y+h/2-9,stripe)
+                c.drawLine(x-w/2+8,y,x+w/2-8,y,p(0xff5c6664.toInt()).apply { strokeWidth=4f })
+            }
+            if(o.kind=="hospital" || o.kind=="school") {
+                val mark=if(o.kind=="hospital") "+" else "S"
+                c.drawCircle(x,y,9f,p(if(o.kind=="hospital")0xffb94f48.toInt() else 0xff6e7659.toInt()))
+                c.drawText(mark,x-4,y+4,p(Color.WHITE).apply { textSize=12f; typeface=Typeface.DEFAULT_BOLD })
+            }
+            if(o.kind=="office") {
+                c.drawRect(x-15,y-12,x+15,y+12,p(0xff49666a.toInt()))
+                c.drawLine(x-12,y-7,x+12,y-7,p(0xffa8c0bc.toInt()).apply { strokeWidth=2f })
             }
         }
-        c.drawRect(x-w/2+4,y+h/2-3,x+w/2-4,y+h/2,p(0x55302b22))
+        c.drawRect(x-3,y+h/2+8,x+3,y+h/2+14,p(0xffb7ad91.toInt()))
     }
 
     private fun drawInterchange(x:Float,y:Float) {

@@ -2,74 +2,145 @@
 <html lang="uz">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#111317"><title>So‘roq — 2D</title>
+<meta name="theme-color" content="#101216"><title>So‘roq — 2D</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101216;color:#eee;font-family:system-ui,-apple-system,sans-serif;touch-action:manipulation}
-#app{height:100dvh;display:flex;flex-direction:column;background:linear-gradient(#171a20,#0d0f13)}
-header{height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #30343b;background:#15181d;font-size:12px;letter-spacing:.12em;color:#c7cbd0}
-#scene{position:relative;flex:1;min-height:0;overflow:hidden;background:#292b2d}
-canvas{width:100%;height:100%;display:block}
-#caption{position:absolute;left:12px;right:12px;bottom:12px;background:#101216df;border:1px solid #42464d;border-radius:9px;padding:10px 12px;font-size:13px;line-height:1.4;min-height:52px;box-shadow:0 8px 24px #0008}
-#controls{flex:none;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#111419;border-top:1px solid #30343b}
-button{border:1px solid #555b64;background:linear-gradient(#30353d,#20242a);color:#f1f2f3;border-radius:8px;padding:13px 8px;font-size:12px;font-weight:650;letter-spacing:.04em;min-height:48px}
+#app{height:100dvh;display:flex;flex-direction:column;background:#111419}
+header{height:46px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 13px;border-bottom:1px solid #34383d;background:#15191e;font-size:11px;letter-spacing:.1em;color:#c7cbd0}
+#scene{position:relative;flex:1;min-height:0;overflow:hidden;background:#292b2d}canvas{width:100%;height:100%;display:block}
+#caption{position:absolute;left:11px;right:11px;bottom:10px;background:#101216eF;border:1px solid #55514a;border-radius:9px;padding:10px 12px;font-size:13px;line-height:1.4;min-height:54px;box-shadow:0 8px 24px #0009}
+#controls{flex:none;padding:9px;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#111419;border-top:1px solid #30343b}
+button{border:1px solid #555b64;background:linear-gradient(#30353d,#20242a);color:#f1f2f3;border-radius:8px;padding:12px 7px;font-size:11px;font-weight:700;letter-spacing:.035em;min-height:46px}
 button:active{transform:scale(.98);background:#454c56}button.primary{border-color:#9a8057;background:linear-gradient(#66543b,#403526)}
-footer{height:22px;flex:none;text-align:center;color:#777e87;font-size:10px;padding:4px}
+footer{height:20px;flex:none;text-align:center;color:#777e87;font-size:9px;padding:4px}
 </style></head>
 <body><div id="app">
-<header><span>SO‘ROQ • 02</span><span id="clock">21:43</span><span>TA’SIS BO‘LIMI</span></header>
+<header><span>SO‘ROQ • 02</span><span id="clock">21:43</span><span>TERGOV XONASI</span></header>
 <main id="scene"><canvas id="view"></canvas><div id="caption">Siz tergov xonasidasiz. Gumonlanuvchi bilan suhbatni boshlang.</div></main>
 <section id="controls">
 <button class="primary" data-action="ask">SAVOL BERISH</button><button data-action="evidence">DALIL KO‘RSATISH</button>
 <button data-action="calm">TINCHLANTIRISH</button><button data-action="firm">QAT’IY OHANG</button>
-</section><footer>2D REALISTIK INTERAKTIV SAHNA • DEMO</footer></div>
+</section><footer>2D INTERAKTIV SAHNA • ISHLAB CHIQILMOQDA</footer></div>
 <script>
-(()=>{const c=document.getElementById('view'),ctx=c.getContext('2d'),caption=document.getElementById('caption');let W=0,H=0,t=0,mood=0,blink=0,action=0;
-function resize(){const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;c.width=W*d;c.height=H*d;ctx.setTransform(d,0,0,d,0,0)}new ResizeObserver(resize).observe(c);
+(()=> {
+const c=document.getElementById('view'),ctx=c.getContext('2d',{alpha:false}),caption=document.getElementById('caption');
+let W=0,H=0,t=0,blink=0,emotion=0,gaze=0,look=0,mouth=0,last=0;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function rr(x,y,w,h,r,col){ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
-function ellipse(x,y,rx,ry,col){ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
-function line(x1,y1,x2,y2,col,lw=1){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
-function draw(){if(!W||!H)return;t+=.016;const s=Math.min(W/390,H/650),ox=(W-390*s)/2,oy=(H-650*s)/2;ctx.save();ctx.translate(ox,oy);ctx.scale(s,s);
-const g=ctx.createLinearGradient(0,0,0,650);g.addColorStop(0,'#55524d');g.addColorStop(.55,'#393a39');g.addColorStop(1,'#222528');ctx.fillStyle=g;ctx.fillRect(0,0,390,650);
-// wall panels, ceiling light, corner shadows
-for(let x=0;x<390;x+=98){line(x,0,x,430,'#77736b22',2);line(x+2,0,x+2,430,'#17191b55',1)}
-rr(122,18,146,9,4,'#d9d0b7');ctx.fillStyle='#e8dfc4';ctx.globalAlpha=.17;ctx.fillRect(80,27,230,330);ctx.globalAlpha=1;
-rr(0,405,390,245,0,'#292725');for(let y=425;y<650;y+=28)line(0,y,390,y,'#71685d25',1);
-// table
-ctx.fillStyle='#171719';ctx.beginPath();ctx.moveTo(12,365);ctx.lineTo(378,365);ctx.lineTo(390,438);ctx.lineTo(0,438);ctx.fill();line(14,369,376,369,'#8c8170',2);rr(32,438,10,142,2,'#171719');rr(348,438,10,142,2,'#171719');
-// chair
-rr(102,236,186,174,25,'#24272b');rr(112,249,166,145,20,'#35383c');line(125,270,125,376,'#77716b33',2);line(266,270,266,376,'#111315',2);
-// shoulders / torso breathing
-const breathe=Math.sin(t*1.7)*2,shy=Math.sin(t*.53)*1.5;
-ctx.fillStyle='#26282b';ctx.beginPath();ctx.moveTo(91,650);ctx.lineTo(96,466);ctx.quadraticCurveTo(101,414,151,395);ctx.lineTo(239,395);ctx.quadraticCurveTo(289,414,294,466);ctx.lineTo(299,650);ctx.fill();
-const shirt=ctx.createLinearGradient(110,400,290,630);shirt.addColorStop(0,'#77716a');shirt.addColorStop(.5,'#4d4a47');shirt.addColorStop(1,'#292b2d');ctx.fillStyle=shirt;ctx.beginPath();ctx.moveTo(99,650);ctx.lineTo(103,471);ctx.quadraticCurveTo(110,424,157,405);ctx.lineTo(235,405);ctx.quadraticCurveTo(280,423,291,471);ctx.lineTo(295,650);ctx.fill();
-line(195,421,195,635,'#b5a99a22',1);line(140,445,122,600,'#d5c7b422',1);
+function resize(){const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;c.width=Math.round(W*d);c.height=Math.round(H*d);ctx.setTransform(d,0,0,d,0,0)}
+if('ResizeObserver'in window)new ResizeObserver(resize).observe(c);else window.addEventListener('resize',resize);resize();
+function ell(x,y,rx,ry,col){ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
+function path(points,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
+function stroke(points,col,w=1){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.stroke()}
+function round(x,y,w,h,r,col){ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function grad(x1,y1,x2,y2,stops){const g=ctx.createLinearGradient(x1,y1,x2,y2);stops.forEach(s=>g.addColorStop(s[0],s[1]));return g}
+function noise(seed){let x=Math.sin(seed*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+function drawRoom(){
+ctx.fillStyle=grad(0,0,0,650,[[0,'#56534d'],[.48,'#393b3a'],[1,'#202326']]);ctx.fillRect(0,0,390,650);
+ctx.fillStyle='#24272a';ctx.fillRect(0,0,390,415);
+for(let x=-10;x<410;x+=78){round(x,0,2,412,1,'#88817618');stroke([[x+4,0],[x+4,410]],'#14171955',1)}
+// stained plaster texture
+for(let i=0;i<180;i++){const x=noise(i+1)*390,y=noise(i+301)*400;ell(x,y,noise(i+91)*1.7+.3,noise(i+71)*1.2+.2,'#d8c9aa0b')}
+round(119,17,152,8,4,'#e2d7bd');ctx.fillStyle='#e8dfc4';ctx.globalAlpha=.12;ctx.fillRect(68,25,254,340);ctx.globalAlpha=1;
+round(18,74,68,215,3,'#282b2d');for(let y=87;y<280;y+=16){round(22,y,60,4,2,'#77746d');round(22,y+4,60,1,1,'#151719')}
+round(302,92,55,245,2,'#272a2b');stroke([[309,104],[309,320]],'#77736b44',2);
+// floor
+ctx.fillStyle=grad(0,405,0,650,[[0,'#393632'],[1,'#1d2022']]);ctx.fillRect(0,405,390,245);
+for(let y=423;y<650;y+=27){stroke([[0,y],[390,y]],'#9c8e7920',1);stroke([[0,y+1],[390,y+1]],'#090b0d55',1)}
+for(let x=-160;x<550;x+=130)stroke([[195,405],[x,650]],'#b7a58a12',1);
+}
+function drawChair(){
+ctx.save();ctx.shadowColor='#0009';ctx.shadowBlur=18;round(100,229,190,191,25,'#171a1d');ctx.restore();
+round(108,239,174,160,20,grad(108,240,280,400,[[0,'#45484a'],[.45,'#303438'],[1,'#202428']]));
+stroke([[125,261],[125,374]],'#a6a39a22',2);stroke([[265,261],[265,374]],'#080a0c77',3);
+round(118,374,154,35,12,'#24282b');
+}
+function drawWoman(){
+const breath=Math.sin(t*1.35)*2.2,shift=Math.sin(t*.47)*1.4,headX=shift+gaze*.55;
+const nervous=emotion>0?Math.min(1,emotion):0;
+ctx.save();
+// body shadow
+ell(195,626,126,25,'#080a0b70');
+// torso and shoulders
+path([[88,650],[94,478],[103,435],[137,408],[166,397],[224,397],[254,408],[286,438],[298,650]],'#25282b');
+ctx.fillStyle=grad(100,402,290,650,[[0,'#77716a'],[.25,'#5e5954'],[.65,'#454341'],[1,'#292c2e']]);
+ctx.beginPath();ctx.moveTo(99,650);ctx.lineTo(103,472);ctx.quadraticCurveTo(110,425,157,405);ctx.quadraticCurveTo(195,394,235,405);ctx.quadraticCurveTo(280,425,291,472);ctx.lineTo(295,650);ctx.closePath();ctx.fill();
+stroke([[116,454],[143,438],[164,432]],'#b8aa982b',2);stroke([[274,454],[248,438],[226,432]],'#14171955',2);
+stroke([[195,420],[195,636]],'#c8b9a31b',1);stroke([[151,447],[132,590]],'#d7c8b51b',1);stroke([[239,447],[259,590]],'#11141655',1);
+// seams and fabric folds
+for(let i=0;i<7;i++)stroke([[116+i*5,485+i*10],[145+i*3,490+i*10]],'#d7c9b51a',1);
 // neck
-rr(171,357+breathe,48,65,13,'#a97860');ellipse(195,357+breathe,24,13,'#bd8b70');
-// hair behind
-ctx.fillStyle='#211b19';ctx.beginPath();ctx.moveTo(137,205);ctx.quadraticCurveTo(125,100,196,93);ctx.quadraticCurveTo(270,96,257,220);ctx.lineTo(260,355);ctx.quadraticCurveTo(236,392,224,355);ctx.lineTo(153,360);ctx.quadraticCurveTo(128,339,137,205);ctx.fill();
-// ears and face
-ellipse(145,249,13,22,'#a97761');ellipse(245,249,13,22,'#a97761');
-const face=ctx.createRadialGradient(174,222,10,196,260,112);face.addColorStop(0,'#d6a587');face.addColorStop(1,'#98664f');ellipse(195+shy,248+breathe,51,75,face);
-// hair cap and side locks
-ctx.fillStyle='#28201d';ctx.beginPath();ctx.moveTo(144,230);ctx.quadraticCurveTo(133,140,191,132);ctx.quadraticCurveTo(251,128,248,222);ctx.quadraticCurveTo(224,190,214,177);ctx.quadraticCurveTo(184,202,147,204);ctx.fill();
-ctx.beginPath();ctx.moveTo(146,207);ctx.quadraticCurveTo(132,278,158,329);ctx.quadraticCurveTo(145,344,137,311);ctx.lineTo(132,235);ctx.fill();ctx.beginPath();ctx.moveTo(245,203);ctx.quadraticCurveTo(261,280,235,336);ctx.quadraticCurveTo(253,349,260,300);ctx.lineTo(258,224);ctx.fill();
-// brows, eyes blinking, nose, lips
-const eyeY=244+breathe*.15,eyeOpen=blink>0?Math.max(.08,1-blink*5):1;
-for(const ex of [176,215]){line(ex-10,eyeY-14,ex+9,eyeY-16,'#49312b',3);ellipse(ex,eyeY,9,4.5*eyeOpen,'#f0e4d7');ellipse(ex+1,eyeY,3.1,3.5*eyeOpen,'#302725');ellipse(ex+1,eyeY,1.4,2.5*eyeOpen,'#111')}
-line(196,250,190,272,'#805440',1.5);line(190,272,198,274,'#805440',1);
-line(184,291,195,294,'#74433e',1.7);line(195,294,207,290,'#74433e',1.7);line(185,292,205,292,'#e0a08c',1);
-// subtle skin details and worried expression
-line(166,225,181,221,'#6e493c55',1);line(207,221,222,225,'#6e493c55',1);ellipse(177,308,2,1,'#805b4d55');ellipse(215,309,2,1,'#805b4d55');
-// hands on table, fingers
-for(const x of [135,232]){ellipse(x,388+breathe,24,13,'#b9866c');for(let j=0;j<4;j++)line(x-13+j*7,390,x-14+j*7,402,'#7f5547',1)}
-// table evidence folder
-rr(24,376,74,7,2,'#b6a27f');rr(28,378,67,34,2,'#4a4034');line(32,385,87,385,'#c8b99a66',1);
-// overhead light and vignette
-const vg=ctx.createRadialGradient(195,280,80,195,280,390);vg.addColorStop(0,'#0000');vg.addColorStop(1,'#050608a8');ctx.fillStyle=vg;ctx.fillRect(0,0,390,650);
-ctx.restore();blink=Math.max(0,blink-.12);if(Math.random()<.012&&blink===0)blink=.2;requestAnimationFrame(draw)}
+round(170+headX,350+breath,49,69,15,'#9e6e57');ell(195+headX,355+breath,24,13,'#c18c70');
+// hair mass behind head
+ctx.fillStyle='#211a18';ctx.beginPath();ctx.moveTo(137+headX,214);ctx.bezierCurveTo(120,108,157,87,198,91);ctx.bezierCurveTo(268,89,274,152,256+headX,239);ctx.lineTo(263,352);ctx.quadraticCurveTo(244,392,222,352);ctx.lineTo(155,359);ctx.quadraticCurveTo(125,350,132,302);ctx.closePath();ctx.fill();
+ctx.fillStyle=grad(132,120,260,350,[[0,'#3a2b25'],[.35,'#241c19'],[1,'#120f0e']]);ctx.beginPath();ctx.moveTo(144+headX,190);ctx.quadraticCurveTo(152,105,204,110);ctx.quadraticCurveTo(259,115,251+headX,210);ctx.lineTo(244,330);ctx.quadraticCurveTo(232,355,222,321);ctx.lineTo(160,330);ctx.closePath();ctx.fill();
+// ears
+ell(145+headX,247+breath,12,20,'#a8755e');ell(245+headX,247+breath,12,20,'#a8755e');ell(146+headX,247+breath,5,10,'#805342');ell(244+headX,247+breath,5,10,'#805342');
+// face gradients
+const fx=195+headX,fy=248+breath;
+const skin=ctx.createRadialGradient(fx-15,fy-28,5,fx,fy,91);skin.addColorStop(0,'#e0b293');skin.addColorStop(.58,'#c18d70');skin.addColorStop(1,'#8f604d');
+ctx.fillStyle=skin;ctx.beginPath();ctx.moveTo(fx,167+breath);ctx.bezierCurveTo(228+headX,164,248+headX,201,246+headX,258+breath);ctx.bezierCurveTo(242+headX,306,222+headX,328+breath,195+headX,328+breath);ctx.bezierCurveTo(165+headX,327,146+headX,296,144+headX,254+breath);ctx.bezierCurveTo(142+headX,205,161+headX,169,fx,167+breath);ctx.fill();
+// cheek shading and highlights
+ell(fx-29,270+breath,15,10,'#d98e7a25');ell(fx+29,270+breath,15,10,'#d98e7a25');stroke([[fx-24,219],[fx-17,216]],'#f5d0b455',2);stroke([[fx+15,216],[fx+23,220]],'#f5d0b433',2);
+// hairline and part
+ctx.fillStyle='#211a18';ctx.beginPath();ctx.moveTo(143+headX,230);ctx.bezierCurveTo(132,169,157,129,195+headX,128);ctx.bezierCurveTo(238,126,259,170,248+headX,229);ctx.quadraticCurveTo(228,194,215+headX,179);ctx.quadraticCurveTo(183,203,147+headX,207);ctx.closePath();ctx.fill();
+stroke([[194+headX,135],[202+headX,165],[211+headX,180]],'#6b5042',1.2);
+ctx.beginPath();ctx.moveTo(145+headX,204);ctx.quadraticCurveTo(132,276,157,328);ctx.quadraticCurveTo(143,347,135,310);ctx.lineTo(132,232);ctx.fill();
+ctx.beginPath();ctx.moveTo(247+headX,205);ctx.quadraticCurveTo(263,280,235,337);ctx.quadraticCurveTo(254,350,261,300);ctx.lineTo(258,224);ctx.fill();
+// eyebrows, eyes and gaze
+const ey=244+breath*.15,open=blink>0?Math.max(.04,1-blink*7):1;
+for(const ex of [176,215]){
+stroke([[ex-10,ey-15-nervous*2],[ex-3,ey-18-nervous*2],[ex+8,ey-15]],'#52372f',3);
+ell(ex,ey,9,4.8*open,'#f0e3d6');ell(ex+gaze*2,ey,3.3,3.6*open,'#514038');ell(ex+gaze*2,ey,1.5,2.5*open,'#171312');
+stroke([[ex-8,ey+3],[ex,ey+5],[ex+8,ey+3]],'#986d5c66',.7);
+}
+stroke([[195,251+breath],[191,270+breath],[197,275+breath]],'#895b49',1.4);ell(194,276+breath,2,1,'#f0c0a0');
+stroke([[184,292+breath],[194,294+breath],[206,291+breath]],'#79463f',1.8);stroke([[185,293+breath],[195,297+breath],[205,293+breath]],'#d89a88',1);
+if(mouth>0){ell(195,294+breath,5,2+mouth*2,'#512b2b');}
+stroke([[165,229],[178,225]],'#855f4f44',1);stroke([[210,225],[224,229]],'#855f4f44',1);
+ell(177,309,1.5,1,'#805b4d66');ell(215,309,1.5,1,'#805b4d66');
+// subtle forehead and skin marks
+for(let i=0;i<5;i++)ell(163+i*13,204+(i%2)*3,.6,.6,'#704e4055');
+// hands resting on table
+for(const x of [137,232]){
+ell(x,389+breath,23,12,'#ae7c64');ell(x-3,386+breath,14,7,'#c18e73');
+for(let j=0;j<4;j++){stroke([[x-13+j*7,390+breath],[x-14+j*7,400+breath]],'#805849',.8);ell(x-13+j*7,391+breath,2,2,'#d5a48a')}
+}
+ctx.restore();
+}
+function drawTable(){
+// table perspective top
+path([[7,366],[383,366],[405,446],[-14,446]],grad(0,366,0,446,[[0,'#5a5145'],[.15,'#282622'],[1,'#111315']]));
+stroke([[10,369],[380,369]],'#a99b83',1.5);stroke([[17,377],[374,377]],'#d2c2a322',1);
+round(31,438,12,155,2,'#151719');round(347,438,12,155,2,'#151719');
+round(28,377,70,34,2,'#493e31');round(24,373,76,7,2,'#b9a27d');stroke([[34,386],[89,386]],'#e2d4b477',1);
+round(46,391,29,1,1,'#d7c8a288');
+}
+function draw(){
+if(!W||!H)return;const dt=Math.min(.04,(performance.now()-last)/1000||.016);last=performance.now();t+=dt;
+const scale=Math.min(W/390,H/650),ox=(W-390*scale)/2,oy=(H-650*scale)/2;
+ctx.fillStyle='#111';ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(ox,oy);ctx.scale(scale,scale);
+drawRoom();drawChair();drawWoman();drawTable();
+// foreground shadow and vignette
+const v=ctx.createRadialGradient(195,270,110,195,300,420);v.addColorStop(0,'#0000');v.addColorStop(1,'#050608b8');ctx.fillStyle=v;ctx.fillRect(0,0,390,650);
+ctx.restore();
+blink=Math.max(0,blink-dt*5);if(Math.random()<dt*.65&&blink===0)blink=.18;
+emotion=Math.max(0,emotion-dt*.035);mouth=Math.max(0,mouth-dt*.8);gaze+=(look-gaze)*dt*2.2;
 requestAnimationFrame(draw);
-const lines={ask:'Gumonlanuvchi ko‘zlarini olib qochadi: “Men hammasini aytib berdim...”',evidence:'Siz dalilni stol ustiga qo‘ydingiz. U hujjatga uzoq tikilib qoldi.',calm:'Siz ovozingizni pasaytirdingiz. U biroz tinchlanib, sizga qaradi.',firm:'Siz qat’iy ohangda savol berdingiz. U bezovta bo‘lib, qo‘llarini qimirlatdi.'};
-document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;caption.textContent=lines[a];mood++;if(navigator.vibrate)navigator.vibrate(18);try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){const ac=new AC(),o=ac.createOscillator(),v=ac.createGain();o.frequency.value=a==='firm'?115:175;v.gain.setValueAtTime(.025,ac.currentTime);v.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.09);o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+.1)}}catch(e){}}));
+}
+requestAnimationFrame(draw);
+const dialogue={
+ask:['Gumonlanuvchi ko‘zlarini olib qochadi: “Men hammasini aytib berdim...”','U chuqur nafas olib, savolingizni kutadi.','“Bu haqda gapirishni istamayman”, deydi u sekin.'],
+evidence:['Siz dalilni stol ustiga qo‘ydingiz. U hujjatga uzoq tikilib qoldi.','U suratga qarab, bir zum jim bo‘lib qoldi.','“Buni qayerdan oldingiz?” — deb so‘radi u.'],
+calm:['Siz ovozingizni pasaytirdingiz. U biroz tinchlanib, sizga qaradi.','U yelkasini bo‘shashtirib, gapirishga tayyorlanadi.','“Mayli, boshidan tushuntirib beraman”, deydi u.'],
+firm:['Siz qat’iy ohangda savol berdingiz. U bezovta bo‘lib, qo‘llarini qimirlatdi.','U qoshlarini chimirib, javob berishdan oldin sukut saqladi.','“Menga bosim o‘tkazmang”, deya javob qaytardi u.']
+};
+let counts={ask:0,evidence:0,calm:0,firm:0};
+document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+const a=b.dataset.action,arr=dialogue[a];caption.textContent=arr[counts[a]++%arr.length];
+emotion=a==='calm'?.15:a==='firm'?.9:.55;look=a==='evidence'?-.65:a==='calm'?.25:.8;mouth=a==='ask'?.65:.2;
+if(navigator.vibrate)navigator.vibrate(a==='firm'?28:14);
+try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){const ac=new AC(),o=ac.createOscillator(),v=ac.createGain();o.type='sine';o.frequency.value=a==='firm'?112:a==='calm'?205:165;v.gain.setValueAtTime(.018,ac.currentTime);v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.12);o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+.13);o.onended=()=>ac.close()}}catch(e){}
+}));
+const clock=document.getElementById('clock');function tick(){clock.textContent=new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'})}tick();setInterval(tick,30000);
 })();
 </script></body></html>

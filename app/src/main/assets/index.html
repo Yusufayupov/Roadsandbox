@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#10151a">
+<title>Допрос: камера 04</title>
+<style>
+:root{--gold:#d9b77a;--panel:rgba(12,18,23,.88);--line:rgba(225,205,165,.3)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b1015;color:#f2eee7;font-family:Arial,Helvetica,sans-serif;touch-action:manipulation}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#1b252b}
+#scene{position:absolute;inset:0;width:100%;height:100%;transition:filter .15s}
+#scene svg{width:100%;height:100%;display:block}
+#hud{position:absolute;left:50%;top:3.2%;transform:translateX(-50%);text-align:center;min-width:210px;padding:8px 22px;background:linear-gradient(90deg,transparent,rgba(8,13,17,.83),transparent);pointer-events:none}
+#hud .small{font-size:10px;letter-spacing:3px;color:#c4b18d;text-transform:uppercase}
+#hud h1{font-size:clamp(15px,2.1vw,24px);font-weight:600;letter-spacing:2px;margin:4px 0 2px}
+#status{font-size:11px;color:#c3c9c8}
+#counter{position:absolute;top:4%;left:3%;padding:10px 13px;border-left:2px solid var(--gold);background:rgba(8,13,17,.65);font-size:12px;letter-spacing:1px}
+#counter b{display:block;font-size:22px;color:var(--gold);margin-top:3px}
+.panel{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:11px;width:clamp(112px,15vw,176px);padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(8px);box-shadow:0 12px 32px #0007}
+#left{left:2.2%}#right{right:2.2%}
+.panel .caption{font-size:9px;letter-spacing:2px;color:#bba77f;text-align:center;margin-bottom:2px}
+button{font:inherit;color:#f4eee3;border:1px solid #76664e;background:linear-gradient(180deg,#39434a,#202a30);border-radius:8px;min-height:52px;padding:8px 7px;font-size:clamp(10px,1.2vw,13px);font-weight:700;letter-spacing:.5px;cursor:pointer;box-shadow:inset 0 1px #ffffff16,0 4px 10px #0005}
+button:active{transform:translateY(2px);filter:brightness(1.35)}
+button .sub{display:block;font-size:9px;color:#c0b6a6;font-weight:400;margin-top:4px;letter-spacing:0}
+button.warn{border-color:#885b55;background:linear-gradient(180deg,#68433f,#382725)}
+button.gold{border-color:#b79660;background:linear-gradient(180deg,#725d3d,#403321)}
+#bottom{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);width:min(46vw,560px);min-width:270px;text-align:center;padding:11px 18px;border:1px solid #ffffff20;border-radius:9px;background:rgba(8,13,17,.78);backdrop-filter:blur(8px)}
+#dialogue{font-size:clamp(11px,1.35vw,15px);line-height:1.4;color:#e7e1d6}
+#speaker{font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:5px}
+#reset{min-height:40px;font-size:10px}
+#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 42%,#0009 100%);transition:background .2s}
+#flash{position:absolute;inset:0;background:#e9d5bb;opacity:0;pointer-events:none}
+#handFX{position:absolute;left:50%;bottom:-4%;width:24%;height:40%;transform:translateX(-50%);opacity:0;pointer-events:none;transition:all .18s}
+#game.hit #handFX{opacity:1;bottom:1%}
+#game.hit #scene{filter:brightness(.88) saturate(.8)}
+#game.shake{animation:shake .22s linear}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,2px)}45%{transform:translate(5px,-2px)}70%{transform:translate(-3px,1px)}}
+@media(max-height:420px){.panel{gap:6px;padding:8px;width:118px}.panel button{min-height:42px}#bottom{bottom:2%;padding:7px 12px}#counter{top:2%}#hud{top:1%}}
+</style>
+</head>
+<body>
+<div id="game">
+<div id="scene">
+<svg viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice" aria-label="Комната для допроса">
+<defs>
+ <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#4a5355"/><stop offset="1" stop-color="#242e32"/></linearGradient>
+ <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#394246"/><stop offset="1" stop-color="#171e22"/></linearGradient>
+ <linearGradient id="light" x2="0" y2="1"><stop stop-color="#fff5d8" stop-opacity=".7"/><stop offset="1" stop-color="#e4c995" stop-opacity="0"/></linearGradient>
+ <linearGradient id="uniform" x2="0" y2="1"><stop stop-color="#777c78"/><stop offset="1" stop-color="#444c4b"/></linearGradient>
+ <linearGradient id="skin" x2="0" y2="1"><stop stop-color="#e5bda1"/><stop offset="1" stop-color="#b9826e"/></linearGradient>
+ <linearGradient id="hair" x2="0" y2="1"><stop stop-color="#3a2924"/><stop offset="1" stop-color="#171719"/></linearGradient>
+ <linearGradient id="table" x2="0" y2="1"><stop stop-color="#655849"/><stop offset="1" stop-color="#292b2a"/></linearGradient>
+ <filter id="shadow"><feGaussianBlur stdDeviation="12"/></filter>
+ <filter id="soft"><feGaussianBlur stdDeviation="4"/></filter>
+</defs>
+<!-- room perspective -->
+<rect width="1200" height="675" fill="#151d21"/>
+<path d="M0 0H1200V480L0 480Z" fill="url(#wall)"/>
+<path d="M0 0L175 95V480H0Z" fill="#202a2e" opacity=".8"/><path d="M1200 0L1025 95V480H1200Z" fill="#1d272b" opacity=".9"/>
+<path d="M0 480L1200 480L1200 675H0Z" fill="url(#floor)"/>
+<path d="M0 480L600 420L1200 480" fill="none" stroke="#77807c" stroke-opacity=".18" stroke-width="4"/>
+<path d="M0 570L600 500L1200 570M0 630L600 535L1200 630" stroke="#a2a59a" stroke-opacity=".08" stroke-width="2" fill="none"/>
+<!-- back wall details -->
+<rect x="65" y="115" width="190" height="270" rx="3" fill="#11191d" stroke="#657074" stroke-width="8"/>
+<rect x="78" y="128" width="164" height="244" fill="#263237"/>
+<path d="M95 145V355M225 145V355" stroke="#536066" stroke-width="2" opacity=".5"/>
+<rect x="955" y="120" width="180" height="180" rx="2" fill="#10191e" stroke="#697276" stroke-width="8"/>
+<rect x="968" y="133" width="154" height="154" fill="#344349"/>
+<path d="M1045 133V287M968 210H1122" stroke="#9aa3a0" stroke-width="4" opacity=".5"/>
+<rect x="980" y="330" width="130" height="7" fill="#7c8581" opacity=".3"/>
+<!-- ceiling light -->
+<ellipse cx="600" cy="110" rx="270" ry="120" fill="url(#light)" opacity=".5"/>
+<rect x="480" y="32" width="240" height="12" rx="5" fill="#e8e0c9" opacity=".75"/>
+<rect x="490" y="44" width="220" height="3" fill="#fff6dc" opacity=".8"/>
+<!-- floor shadow -->
+<ellipse cx="600" cy="555" rx="330" ry="45" fill="#000" opacity=".45" filter="url(#soft)"/>
+<!-- chair -->
+<path d="M465 300Q455 265 485 250H715Q745 265 735 300L720 495H480Z" fill="#20292d" stroke="#596367" stroke-width="7"/>
+<path d="M485 305H715V455H485Z" fill="#303a3e"/>
+<path d="M485 450L470 560M715 450L730 560" stroke="#171d20" stroke-width="15"/>
+<!-- woman silhouette/body -->
+<g id="woman">
+ <!-- hair behind -->
+ <path d="M505 230Q480 150 530 115Q600 65 670 112Q725 150 695 255L690 340L515 340Z" fill="url(#hair)"/>
+ <!-- shoulders and torso -->
+ <path d="M485 340Q505 300 555 290L645 290Q695 305 715 350L750 500Q690 535 600 535Q510 535 450 500Z" fill="url(#uniform)" stroke="#303a3b" stroke-width="4"/>
+ <path d="M555 294L600 355L645 294L665 315L620 395H580L535 315Z" fill="#8d9189" opacity=".5"/>
+ <path d="M600 355V520" stroke="#313b3a" stroke-width="3" opacity=".5"/>
+ <path d="M520 350L545 465M680 350L655 465" stroke="#a6a79a" stroke-opacity=".18" stroke-width="3"/>
+ <!-- arms resting forward -->
+ <path d="M488 355Q455 385 455 440L500 482Q535 490 550 462L535 405Z" fill="#bd8e79"/>
+ <path d="M712 355Q745 385 745 440L700 482Q665 490 650 462L665 405Z" fill="#bd8e79"/>
+ <path d="M466 442Q490 460 520 465M734 442Q710 460 680 465" stroke="#8b665b" stroke-width="3" fill="none"/>
+ <!-- neck -->
+ <path d="M565 260H635V320Q625 345 600 348Q575 345 565 320Z" fill="url(#skin)"/>
+ <!-- ears -->
+ <ellipse cx="516" cy="220" rx="17" ry="26" fill="#c58f78"/><ellipse cx="684" cy="220" rx="17" ry="26" fill="#c58f78"/>
+ <!-- face -->
+ <path d="M523 160Q530 115 600 115Q670 115 677 160L670 240Q655 285 600 295Q545 285 530 240Z" fill="url(#skin)" stroke="#9d6e60" stroke-width="2"/>
+ <!-- hair cap and fringe -->
+ <path d="M516 205Q495 125 550 93Q605 60 660 95Q710 130 684 220L667 185Q660 151 638 140Q600 160 555 139Q540 165 530 215Z" fill="url(#hair)"/>
+ <path d="M540 142Q560 112 590 123Q620 134 647 115Q665 130 671 160Q640 150 622 157Q585 169 550 157Z" fill="#2a201e"/>
+ <path d="M526 185Q512 245 545 286Q522 270 510 235Z" fill="#201b1b"/>
+ <path d="M674 180Q691 245 656 286Q684 265 692 232Z" fill="#201b1b"/>
+ <!-- eyebrows -->
+ <path d="M550 204Q568 193 584 203M616 203Q635 193 651 204" stroke="#49332d" stroke-width="5" stroke-linecap="round" fill="none"/>
+ <!-- eyes -->
+ <path d="M550 220Q568 210 586 220Q568 232 550 220M614 220Q632 210 650 220Q632 232 614 220" fill="#f0e5d7"/>
+ <ellipse cx="570" cy="220" rx="5" ry="7" fill="#3c3935"/><ellipse cx="630" cy="220" rx="5" ry="7" fill="#3c3935"/>
+ <path d="M550 214Q568 207 586 216M614 216Q632 207 650 214" stroke="#3c2925" stroke-width="2" fill="none"/>
+ <!-- nose -->
+ <path d="M600 220L590 250Q600 258 610 250" stroke="#9d6e60" stroke-width="2.5" fill="none"/>
+ <!-- mouth -->
+ <path id="mouth" d="M578 270Q600 276 622 270" stroke="#854e4a" stroke-width="3" stroke-linecap="round" fill="none"/>
+ <path d="M580 278Q600 282 620 278" stroke="#e2aa9a" stroke-width="2" fill="none" opacity=".6"/>
+ <!-- hair strands -->
+ <path d="M534 135Q522 180 530 220M552 105Q545 145 554 165M650 108Q665 150 660 175M675 140Q684 180 672 220" stroke="#695047" stroke-width="3" opacity=".45" fill="none"/>
+</g>
+<!-- table between player and suspect -->
+<path d="M260 490L940 490L1080 675H120L260 490Z" fill="url(#table)" stroke="#161c1e" stroke-width="7"/>
+<path d="M260 490L940 490" stroke="#a18c6c" stroke-width="5" opacity=".55"/>
+<path d="M300 520L900 520" stroke="#d4c3a1" stroke-width="2" opacity=".13"/>
+<!-- paper, recorder -->
+<rect x="780" y="535" width="120" height="75" rx="3" fill="#d5d0c1" transform="rotate(-5 780 535)" opacity=".8"/>
+<path d="M795 548L875 540M795 560L860 553M795 572L850 566" stroke="#77766d" stroke-width="2" opacity=".5"/>
+<rect x="330" y="540" width="86" height="48" rx="5" fill="#111719" stroke="#8b8c80" stroke-width="2"/>
+<circle cx="400" cy="564" r="6" fill="#9c4c43"/><circle cx="350" cy="564" r="3" fill="#c5b88f"/>
+<!-- player's forearms in POV -->
+<path d="M0 675L0 620Q60 570 180 570L260 675Z" fill="#b9846f" opacity=".95"/>
+<path d="M1200 675L1200 620Q1140 570 1020 570L940 675Z" fill="#b9846f" opacity=".95"/>
+<path d="M30 630Q100 590 165 600M1170 630Q1100 590 1035 600" stroke="#e0b39a" stroke-width="5" opacity=".35" fill="none"/>
+<!-- non-graphic injury overlay -->
+<g id="marks" opacity="0">
+ <ellipse class="mark" cx="548" cy="240" rx="17" ry="10" fill="#6d4b62" opacity="0"/>
+ <ellipse class="mark" cx="652" cy="241" rx="17" ry="10" fill="#6d4b62" opacity="0"/>
+ <ellipse class="mark" cx="600" cy="286" rx="22" ry="8" fill="#80535a" opacity="0"/>
+ <ellipse class="mark" cx="572" cy="317" rx="16" ry="6" fill="#8b5652" opacity="0"/>
+ <ellipse class="mark" cx="630" cy="317" rx="16" ry="6" fill="#8b5652" opacity="0"/>
+</g>
+</svg>
+</div>
+<div id="counter">ДЕЙСТВИЯ<b id="count">0</b></div>
+<div id="hud"><div class="small">Отдел расследований · камера 04</div><h1>ДОПРОС</h1><div id="status">Подозреваемая · женщина · 28 лет</div></div>
+<div id="left" class="panel"><div class="caption">ВОЗДЕЙСТВИЕ</div>
+<button class="warn" onclick="act('slap')">ПОЩЁЧИНА<span class="sub">резкое действие</span></button>
+<button class="warn" onclick="act('punch')">УДАР КУЛАКОМ<span class="sub">сильный удар</span></button></div>
+<div id="right" class="panel"><div class="caption">ДРУГИЕ ДЕЙСТВИЯ</div>
+<button class="warn" onclick="act('hold')">ЗАХВАТ<span class="sub">короткая анимация</span></button>
+<button class="gold" onclick="question()">ЗАДАТЬ ВОПРОС<span class="sub">продолжить допрос</span></button>
+<button id="reset" onclick="resetGame()">↻ ВЕРНУТЬ ОБРАЗ</button></div>
+<div id="bottom"><div id="speaker">ПОДОЗРЕВАЕМАЯ</div><div id="dialogue">«Я уже всё рассказала. Что ещё вам нужно?»</div></div>
+<div id="vignette"></div><div id="flash"></div>
+</div>
+<script>
+let hits=0, dialogueIndex=0, busy=false;
+const game=document.getElementById('game'), countEl=document.getElementById('count'), dialog=document.getElementById('dialogue'), speaker=document.getElementById('speaker'), statusEl=document.getElementById('status');
+const lines={
+ slap:['«Хватит! Я не обязана отвечать на это!»','«Пожалуйста… дайте мне объяснить.»','«Я ничего не скрываю.»'],
+ punch:['«Мне больно… остановитесь.»','«Я скажу, что знаю. Только прекратите.»','«Вы не получите правду таким способом.»'],
+ hold:['«Отпустите меня!»','«Мне трудно дышать…»','«Хватит! Я отвечу на вопросы.»']
+};
+function act(type){
+ if(busy)return; busy=true; hits++; countEl.textContent=hits;
+ const marks=document.querySelectorAll('#marks .mark');
+ const idx=(hits-1)%marks.length; marks[idx].style.opacity=String(Math.min(.18+Math.ceil(hits/2)*.12,.72));
+ document.getElementById('marks').setAttribute('opacity','1');
+ const woman=document.getElementById('woman');
+ woman.style.transform='translate('+(type==='slap'?(hits%2?'-7':'7'):type==='punch'?'0':'0')+'px,'+(type==='hold'?'-4':'2')+'px)';
+ woman.style.transition='transform .16s';
+ game.classList.add('shake','hit');
+ document.getElementById('flash').animate([{opacity:.24},{opacity:0}],{duration:180});
+ speaker.textContent=type==='slap'?'ПОЩЁЧИНА':type==='punch'?'УДАР':'ЗАХВАТ';
+ dialog.textContent=lines[type][Math.min(Math.floor((hits-1)/2),2)];
+ statusEl.textContent=hits>=7?'Состояние ухудшается · допрос прерван':hits>=3?'Подозреваемая напугана · напряжение растёт':'Подозреваемая · напряжена';
+ setTimeout(()=>{game.classList.remove('shake','hit');woman.style.transform='';busy=false;},260);
+ if(hits>=10){dialog.textContent='Допрос остановлен. Состояние подозреваемой требует медицинской помощи.';speaker.textContent='СИСТЕМА';}
+}
+function question(){
+ if(busy)return;
+ const q=['«Я была дома в тот вечер. Проверьте камеры.»','«Я не знаю, кто оставил тот пакет.»','«Хорошо… я расскажу, что видела.»','«Мне нужен адвокат.»'];
+ speaker.textContent='ДОПРОС';dialog.textContent=q[dialogueIndex%q.length];dialogueIndex++;
+}
+function resetGame(){
+ hits=0;dialogueIndex=0;countEl.textContent='0';
+ document.querySelectorAll('#marks .mark').forEach(m=>m.style.opacity='0');
+ document.getElementById('marks').setAttribute('opacity','0');
+ document.getElementById('woman').style.transform='';
+ speaker.textContent='ПОДОЗРЕВАЕМАЯ';
+ dialog.textContent='«Я уже всё рассказала. Что ещё вам нужно?»';
+ statusEl.textContent='Подозреваемая · женщина · 28 лет';
+}
+</script>
+</body></html>

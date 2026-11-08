@@ -162,21 +162,21 @@ func _build_suspect() -> void:
 	_sphere(head, 0.31, Vector3(0, 0.02, 0), materials["skin"], Vector3(0.83, 1.13, 0.78))
 	# Jaw and cheek volume.
 	_sphere(head, 0.22, Vector3(0, -0.12, -0.015), materials["skin_light"], Vector3(0.9, 0.65, 0.78))
-	_sphere(head, 0.34, Vector3(0, 0.14, 0.045), materials["hair"], Vector3(1.02, 1.12, 0.92))
+	_sphere(head, 0.34, Vector3(0, 0.14, -0.06), materials["hair"], Vector3(1.02, 1.12, 0.92))
 	# Hair fringe, side locks.
-	_sphere(head, 0.18, Vector3(0, 0.22, -0.205), materials["hair_hi"], Vector3(1.28, 0.48, 0.43))
+	_sphere(head, 0.18, Vector3(0, 0.22, 0.205), materials["hair_hi"], Vector3(1.28, 0.48, 0.43))
 	for side in [-1.0, 1.0]:
 		_capsule(head, 0.075, 0.48, Vector3(side * 0.255, -0.06, -0.02), materials["hair"])
 		_sphere(head, 0.055, Vector3(side * 0.27, 0.0, -0.06), materials["skin"], Vector3(0.7, 1.0, 0.6))
 	# Eyes, brows, nose, lips are separate geometry for visible expressions.
 	for side in [-1.0, 1.0]:
-		_sphere(head, 0.067, Vector3(side * 0.115, 0.055, -0.237), materials["eye_white"], Vector3(1.0, 0.52, 0.4))
-		var iris := _sphere(head, 0.031, Vector3(side * 0.115, 0.052, -0.264), materials["iris"], Vector3(1, 1, 0.55))
-		_sphere(head, 0.016, Vector3(side * 0.115, 0.052, -0.278), materials["pupil"], Vector3(1, 1, 0.5))
-		_sphere(head, 0.012, Vector3(side * 0.104, 0.064, -0.286), materials["eye_white"], Vector3(1, 1, 0.5))
-		_sphere(head, 0.073, Vector3(side * 0.115, 0.145, -0.22), materials["hair"], Vector3(1.1, 0.22, 0.45))
-	_sphere(head, 0.055, Vector3(0, -0.005, -0.29), materials["skin_light"], Vector3(0.62, 0.72, 0.52))
-	_sphere(head, 0.085, Vector3(0, -0.19, -0.255), materials["lip"], Vector3(0.85, 0.24, 0.38))
+		_sphere(head, 0.067, Vector3(side * 0.115, 0.055, 0.237), materials["eye_white"], Vector3(1.0, 0.52, 0.4))
+		var iris := _sphere(head, 0.031, Vector3(side * 0.115, 0.052, 0.264), materials["iris"], Vector3(1, 1, 0.55))
+		_sphere(head, 0.016, Vector3(side * 0.115, 0.052, 0.278), materials["pupil"], Vector3(1, 1, 0.5))
+		_sphere(head, 0.012, Vector3(side * 0.104, 0.064, 0.286), materials["eye_white"], Vector3(1, 1, 0.5))
+		_sphere(head, 0.073, Vector3(side * 0.115, 0.145, 0.22), materials["hair"], Vector3(1.1, 0.22, 0.45))
+	_sphere(head, 0.055, Vector3(0, -0.005, 0.29), materials["skin_light"], Vector3(0.62, 0.72, 0.52))
+	_sphere(head, 0.085, Vector3(0, -0.19, 0.255), materials["lip"], Vector3(0.85, 0.24, 0.38))
 	# Ears.
 	for side in [-1.0, 1.0]:
 		_sphere(head, 0.075, Vector3(side * 0.255, -0.035, 0), materials["skin"], Vector3(0.45, 0.72, 0.52))

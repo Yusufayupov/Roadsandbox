@@ -78,6 +78,7 @@ class MainActivity : Activity() {
             Triple("▥", "Мост", "bridge"),
             Triple("✣", "Развязка", "interchange"),
             Triple("◉", "Кольцо", "roundabout"),
+            Triple("⌖", "Перемещение", "pan"),
             Triple("□", "Фигура", "rect"),
             Triple("○", "Круг", "circle"),
             Triple("△", "Треуг.", "triangle"),
@@ -270,7 +271,7 @@ private class CityMapView(context: android.content.Context) : View(context) {
                 obj.put("points", pts); strokeArray.put(obj)
             }
             val itemArray = JSONArray()
-            items.forEach { itemArray.put(JSONObject().put("x", item.x.toDouble()).put("y", item.y.toDouble()).put("kind", item.kind).put("w", item.w.toDouble()).put("h", item.h.toDouble())) }
+            items.forEach { item -> itemArray.put(JSONObject().put("x", item.x.toDouble()).put("y", item.y.toDouble()).put("kind", item.kind).put("w", item.w.toDouble()).put("h", item.h.toDouble())) }
             root.put("strokes", strokeArray).put("items", itemArray)
             context.getSharedPreferences("city_sandbox_world", android.content.Context.MODE_PRIVATE).edit().putString("world", root.toString()).apply()
         } catch (_: Exception) { }
@@ -445,10 +446,10 @@ private class CityMapView(context: android.content.Context) : View(context) {
             c.drawCircle(x+11,y-12,4f,p(0x667fa56a))
             return
         }
-        val w=when(o.kind) { "block"->82f; "factory"->100f; "parking"->92f; else->58f }
-        val h=when(o.kind) { "block"->70f; "factory"->78f; "parking"->64f; else->52f }
-        val wall=when(o.kind) { "factory"->0xff777b74.toInt(); "block"->0xff8c877b.toInt(); else->0xffa18a70.toInt() }
-        val roof=when(o.kind) { "factory"->0xffa9aaa1.toInt(); "block"->0xffb9b3a5.toInt(); "parking"->0xff7e8888.toInt(); else->0xffc9a783.toInt() }
+        val w=when(o.kind) { "block"->82f; "factory"->100f; "parking"->92f; "hospital","school","warehouse","office"->88f; "shop"->66f; else->58f }
+        val h=when(o.kind) { "block"->70f; "factory"->78f; "parking"->64f; "hospital","school","warehouse","office"->72f; "shop"->58f; else->52f }
+        val wall=when(o.kind) { "factory","warehouse"->0xff777b74.toInt(); "block"->0xff8c877b.toInt(); "hospital"->0xffd4d4c9.toInt(); "school"->0xffb99b68.toInt(); "office"->0xff687c80.toInt(); "shop"->0xffa77c58.toInt(); else->0xffa18a70.toInt() }
+        val roof=when(o.kind) { "factory","warehouse"->0xffa9aaa1.toInt(); "block"->0xffb9b3a5.toInt(); "parking"->0xff7e8888.toInt(); "hospital"->0xffe9e8df.toInt(); "school"->0xffd5b978.toInt(); "office"->0xff9db5b9.toInt(); "shop"->0xffd6a77c.toInt(); else->0xffc9a783.toInt() }
         // Isometric-style extruded walls and roof, similar to miniature city builders.
         val side=Path().apply { moveTo(x-w/2,y-h/2); lineTo(x-w/2+9,y-h/2+7); lineTo(x-w/2+9,y+h/2+7); lineTo(x-w/2,y+h/2); close() }
         c.drawPath(side,p(0xff555951.toInt()))

@@ -1,193 +1,150 @@
 <!doctype html>
-<html lang="ru">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#10151a">
-<title>Допрос: камера 04</title>
+<html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#101317"><title>So‘roq — 04-xona</title>
 <style>
-:root{--gold:#d9b77a;--panel:rgba(12,18,23,.88);--line:rgba(225,205,165,.3)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#0b1015;color:#f2eee7;font-family:Arial,Helvetica,sans-serif;touch-action:manipulation}
-#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#1b252b}
-#scene{position:absolute;inset:0;width:100%;height:100%;transition:filter .15s}
-#scene svg{width:100%;height:100%;display:block}
-#hud{position:absolute;left:50%;top:3.2%;transform:translateX(-50%);text-align:center;min-width:210px;padding:8px 22px;background:linear-gradient(90deg,transparent,rgba(8,13,17,.83),transparent);pointer-events:none}
-#hud .small{font-size:10px;letter-spacing:3px;color:#c4b18d;text-transform:uppercase}
-#hud h1{font-size:clamp(15px,2.1vw,24px);font-weight:600;letter-spacing:2px;margin:4px 0 2px}
-#status{font-size:11px;color:#c3c9c8}
-#counter{position:absolute;top:4%;left:3%;padding:10px 13px;border-left:2px solid var(--gold);background:rgba(8,13,17,.65);font-size:12px;letter-spacing:1px}
-#counter b{display:block;font-size:22px;color:var(--gold);margin-top:3px}
-.panel{position:absolute;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:11px;width:clamp(112px,15vw,176px);padding:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;backdrop-filter:blur(8px);box-shadow:0 12px 32px #0007}
-#left{left:2.2%}#right{right:2.2%}
-.panel .caption{font-size:9px;letter-spacing:2px;color:#bba77f;text-align:center;margin-bottom:2px}
-button{font:inherit;color:#f4eee3;border:1px solid #76664e;background:linear-gradient(180deg,#39434a,#202a30);border-radius:8px;min-height:52px;padding:8px 7px;font-size:clamp(10px,1.2vw,13px);font-weight:700;letter-spacing:.5px;cursor:pointer;box-shadow:inset 0 1px #ffffff16,0 4px 10px #0005}
-button:active{transform:translateY(2px);filter:brightness(1.35)}
-button .sub{display:block;font-size:9px;color:#c0b6a6;font-weight:400;margin-top:4px;letter-spacing:0}
-button.warn{border-color:#885b55;background:linear-gradient(180deg,#68433f,#382725)}
-button.gold{border-color:#b79660;background:linear-gradient(180deg,#725d3d,#403321)}
-#bottom{position:absolute;left:50%;bottom:3%;transform:translateX(-50%);width:min(46vw,560px);min-width:270px;text-align:center;padding:11px 18px;border:1px solid #ffffff20;border-radius:9px;background:rgba(8,13,17,.78);backdrop-filter:blur(8px)}
-#dialogue{font-size:clamp(11px,1.35vw,15px);line-height:1.4;color:#e7e1d6}
-#speaker{font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:5px}
-#reset{min-height:40px;font-size:10px}
-#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 42%,#0009 100%);transition:background .2s}
-#flash{position:absolute;inset:0;background:#e9d5bb;opacity:0;pointer-events:none}
-#handFX{position:absolute;left:50%;bottom:-4%;width:24%;height:40%;transform:translateX(-50%);opacity:0;pointer-events:none;transition:all .18s}
-#game.hit #handFX{opacity:1;bottom:1%}
-#game.hit #scene{filter:brightness(.88) saturate(.8)}
-#game.shake{animation:shake .22s linear}
-@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,2px)}45%{transform:translate(5px,-2px)}70%{transform:translate(-3px,1px)}}
-@media(max-height:420px){.panel{gap:6px;padding:8px;width:118px}.panel button{min-height:42px}#bottom{bottom:2%;padding:7px 12px}#counter{top:2%}#hud{top:1%}}
-</style>
-</head>
-<body>
-<div id="game">
-<div id="scene">
-<svg viewBox="0 0 1200 675" preserveAspectRatio="xMidYMid slice" aria-label="Комната для допроса">
+:root{--gold:#d9bd8a;--glass:rgba(13,17,21,.86)}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101317;color:#f3eee7;font-family:Arial, sans-serif;touch-action:manipulation}
+#game{position:relative;width:100vw;height:100dvh;overflow:hidden;background:#20282a;isolation:isolate}
+#scene{position:absolute;inset:0;transition:filter .15s}#scene svg{width:100%;height:100%;display:block}
+#top{position:absolute;top:env(safe-area-inset-top,8px);left:50%;transform:translateX(-50%);text-align:center;width:65%;padding:8px 4px;background:linear-gradient(90deg,transparent,#101317d9,transparent);pointer-events:none}
+#top small{color:var(--gold);font-size:9px;letter-spacing:2.5px}#top strong{display:block;font-size:18px;letter-spacing:3px;margin:3px}
+#counter{position:absolute;top:calc(env(safe-area-inset-top,8px) + 8px);left:10px;padding:8px 10px;background:#090d10b8;border-left:2px solid var(--gold);font-size:9px;letter-spacing:1px}#counter b{display:block;color:var(--gold);font-size:21px}
+.panel{position:absolute;top:49%;transform:translateY(-50%);display:flex;flex-direction:column;gap:9px;width:clamp(72px,20vw,92px);padding:7px;background:var(--glass);border:1px solid #d4c09a44;border-radius:12px;backdrop-filter:blur(9px);box-shadow:0 8px 25px #0008}
+#left{left:7px}#right{right:7px}.cap{text-align:center;color:#d4bd91;font-size:8px;letter-spacing:1px;margin-bottom:2px}
+button{font:inherit;color:#f4eee7;border:1px solid #77654c;background:linear-gradient(#465057,#222c31);border-radius:8px;min-height:56px;padding:7px 3px;font-size:10px;font-weight:700;line-height:1.2;box-shadow:inset 0 1px #ffffff18,0 3px 9px #0006}
+button:active{filter:brightness(1.4);transform:scale(.97)}button.warn{border-color:#96635a;background:linear-gradient(#70453f,#392725)}button.gold{border-color:#b79660;background:linear-gradient(#75603f,#403421)}button .sub{display:block;font-size:8px;font-weight:400;color:#c8bba8;margin-top:4px}
+#bottom{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,8px) + 8px);width:calc(100% - 24px);max-width:480px;padding:12px 16px;text-align:center;background:#080c10e8;border:1px solid #ffffff24;border-radius:12px;backdrop-filter:blur(10px)}
+#speaker{font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:6px}#dialogue{font-size:14px;line-height:1.4;min-height:40px}
+#reset{min-height:37px;margin-top:8px;width:100%;font-size:9px}
+#hint{position:absolute;bottom:calc(env(safe-area-inset-bottom,8px) + 126px);left:50%;transform:translateX(-50%);font-size:9px;color:#e4d7c0;background:#101317a8;padding:5px 10px;border-radius:20px;white-space:nowrap}
+#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse,transparent 35%,#0009 100%)}
+#flash{position:absolute;inset:0;background:#f7e8d4;opacity:0;pointer-events:none}
+#impact{position:absolute;left:50%;bottom:-30%;width:46%;height:52%;transform:translateX(-50%);opacity:0;pointer-events:none}
+#game.hit #impact{opacity:1;animation:arm .48s ease-out forwards}
+@keyframes arm{0%{transform:translate(-50%,90%) rotate(-20deg)}45%{transform:translate(-50%,-8%) rotate(8deg)}70%{transform:translate(-50%,4%) rotate(-3deg)}100%{transform:translate(-50%,100%) rotate(-20deg)}}
+#game.shake{animation:shake .32s linear}#game.recoil #scene{filter:brightness(.8) saturate(.72)}
+@keyframes shake{0%,100%{transform:translate(0)}15%{transform:translate(-5px,2px)}32%{transform:translate(6px,-3px)}50%{transform:translate(-4px,2px)}70%{transform:translate(3px,-1px)}}
+@media(min-aspect-ratio:7/10){#scene{transform:scale(1.03)}}
+</style></head><body><main id="game">
+<div id="scene"><svg viewBox="0 0 420 900" preserveAspectRatio="xMidYMid slice" role="img" aria-label="So‘roq xonasi">
 <defs>
- <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#4a5355"/><stop offset="1" stop-color="#242e32"/></linearGradient>
- <linearGradient id="floor" x2="0" y2="1"><stop stop-color="#394246"/><stop offset="1" stop-color="#171e22"/></linearGradient>
- <linearGradient id="light" x2="0" y2="1"><stop stop-color="#fff5d8" stop-opacity=".7"/><stop offset="1" stop-color="#e4c995" stop-opacity="0"/></linearGradient>
- <linearGradient id="uniform" x2="0" y2="1"><stop stop-color="#777c78"/><stop offset="1" stop-color="#444c4b"/></linearGradient>
- <linearGradient id="skin" x2="0" y2="1"><stop stop-color="#e5bda1"/><stop offset="1" stop-color="#b9826e"/></linearGradient>
- <linearGradient id="hair" x2="0" y2="1"><stop stop-color="#3a2924"/><stop offset="1" stop-color="#171719"/></linearGradient>
- <linearGradient id="table" x2="0" y2="1"><stop stop-color="#655849"/><stop offset="1" stop-color="#292b2a"/></linearGradient>
- <filter id="shadow"><feGaussianBlur stdDeviation="12"/></filter>
- <filter id="soft"><feGaussianBlur stdDeviation="4"/></filter>
+ <linearGradient id="wall" x2="0" y2="1"><stop stop-color="#4a5050"/><stop offset=".65" stop-color="#293236"/><stop offset="1" stop-color="#1b2428"/></linearGradient>
+ <linearGradient id="skin" x2=".15" y2="1"><stop stop-color="#f2cdb0"/><stop offset=".38" stop-color="#d9a98c"/><stop offset="1" stop-color="#a66f60"/></linearGradient>
+ <linearGradient id="hair" x2=".3" y2="1"><stop stop-color="#44302a"/><stop offset=".48" stop-color="#211b1b"/><stop offset="1" stop-color="#100f11"/></linearGradient>
+ <linearGradient id="shirt" x2="0" y2="1"><stop stop-color="#8b8e89"/><stop offset="1" stop-color="#3d4848"/></linearGradient>
+ <linearGradient id="desk" x2="0" y2="1"><stop stop-color="#806b52"/><stop offset="1" stop-color="#292b2a"/></linearGradient>
+ <radialGradient id="lamp"><stop stop-color="#f6e5bf" stop-opacity=".55"/><stop offset="1" stop-color="#f6e5bf" stop-opacity="0"/></radialGradient>
+ <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="8"/><feColorMatrix values="0 0 0 0 .45 0 0 0 0 .39 0 0 0 0 .32 0 0 0 .10 0"/></filter>
+ <filter id="blur"><feGaussianBlur stdDeviation="12"/></filter>
+ <filter id="shadow"><feGaussianBlur stdDeviation="5"/></filter>
 </defs>
-<!-- room perspective -->
-<rect width="1200" height="675" fill="#151d21"/>
-<path d="M0 0H1200V480L0 480Z" fill="url(#wall)"/>
-<path d="M0 0L175 95V480H0Z" fill="#202a2e" opacity=".8"/><path d="M1200 0L1025 95V480H1200Z" fill="#1d272b" opacity=".9"/>
-<path d="M0 480L1200 480L1200 675H0Z" fill="url(#floor)"/>
-<path d="M0 480L600 420L1200 480" fill="none" stroke="#77807c" stroke-opacity=".18" stroke-width="4"/>
-<path d="M0 570L600 500L1200 570M0 630L600 535L1200 630" stroke="#a2a59a" stroke-opacity=".08" stroke-width="2" fill="none"/>
-<!-- back wall details -->
-<rect x="65" y="115" width="190" height="270" rx="3" fill="#11191d" stroke="#657074" stroke-width="8"/>
-<rect x="78" y="128" width="164" height="244" fill="#263237"/>
-<path d="M95 145V355M225 145V355" stroke="#536066" stroke-width="2" opacity=".5"/>
-<rect x="955" y="120" width="180" height="180" rx="2" fill="#10191e" stroke="#697276" stroke-width="8"/>
-<rect x="968" y="133" width="154" height="154" fill="#344349"/>
-<path d="M1045 133V287M968 210H1122" stroke="#9aa3a0" stroke-width="4" opacity=".5"/>
-<rect x="980" y="330" width="130" height="7" fill="#7c8581" opacity=".3"/>
-<!-- ceiling light -->
-<ellipse cx="600" cy="110" rx="270" ry="120" fill="url(#light)" opacity=".5"/>
-<rect x="480" y="32" width="240" height="12" rx="5" fill="#e8e0c9" opacity=".75"/>
-<rect x="490" y="44" width="220" height="3" fill="#fff6dc" opacity=".8"/>
-<!-- floor shadow -->
-<ellipse cx="600" cy="555" rx="330" ry="45" fill="#000" opacity=".45" filter="url(#soft)"/>
-<!-- chair -->
-<path d="M465 300Q455 265 485 250H715Q745 265 735 300L720 495H480Z" fill="#20292d" stroke="#596367" stroke-width="7"/>
-<path d="M485 305H715V455H485Z" fill="#303a3e"/>
-<path d="M485 450L470 560M715 450L730 560" stroke="#171d20" stroke-width="15"/>
-<!-- woman silhouette/body -->
+<rect width="420" height="900" fill="#141b1f"/><path d="M0 0H420V620H0Z" fill="url(#wall)"/><path d="M0 0L50 75V620H0M420 0L370 75V620H420" fill="#151e22" opacity=".55"/>
+<path d="M0 620L420 620V900H0Z" fill="#252c2e"/>
+<rect x="22" y="145" width="92" height="245" rx="3" fill="#10181c" stroke="#687175" stroke-width="6"/><rect x="30" y="153" width="76" height="229" fill="#344147"/>
+<path d="M36 165V370M98 165V370" stroke="#7d8886" opacity=".24" stroke-width="2"/>
+<rect x="303" y="170" width="90" height="150" fill="#131b20" stroke="#626b6d" stroke-width="6"/><rect x="311" y="178" width="74" height="134" fill="#3b494d"/><path d="M348 178V312M311 245H385" stroke="#a2aaa5" opacity=".35" stroke-width="3"/>
+<ellipse cx="210" cy="180" rx="210" ry="180" fill="url(#lamp)"/><rect x="145" y="62" width="130" height="7" rx="4" fill="#f4e8ce" opacity=".65"/>
+<ellipse cx="210" cy="620" rx="155" ry="28" fill="#000" opacity=".5" filter="url(#blur)"/>
+<!-- chair and torso -->
+<path d="M110 355Q105 315 142 300H278Q315 315 310 355L320 605H100Z" fill="#1c2529" stroke="#566064" stroke-width="6"/>
+<path d="M126 360H294V565H126Z" fill="#303a3d"/>
 <g id="woman">
- <!-- hair behind -->
- <path d="M505 230Q480 150 530 115Q600 65 670 112Q725 150 695 255L690 340L515 340Z" fill="url(#hair)"/>
- <!-- shoulders and torso -->
- <path d="M485 340Q505 300 555 290L645 290Q695 305 715 350L750 500Q690 535 600 535Q510 535 450 500Z" fill="url(#uniform)" stroke="#303a3b" stroke-width="4"/>
- <path d="M555 294L600 355L645 294L665 315L620 395H580L535 315Z" fill="#8d9189" opacity=".5"/>
- <path d="M600 355V520" stroke="#313b3a" stroke-width="3" opacity=".5"/>
- <path d="M520 350L545 465M680 350L655 465" stroke="#a6a79a" stroke-opacity=".18" stroke-width="3"/>
- <!-- arms resting forward -->
- <path d="M488 355Q455 385 455 440L500 482Q535 490 550 462L535 405Z" fill="#bd8e79"/>
- <path d="M712 355Q745 385 745 440L700 482Q665 490 650 462L665 405Z" fill="#bd8e79"/>
- <path d="M466 442Q490 460 520 465M734 442Q710 460 680 465" stroke="#8b665b" stroke-width="3" fill="none"/>
+ <path d="M90 440Q105 370 145 355L180 340H240L275 355Q315 375 330 450L352 650H68Z" fill="url(#shirt)" stroke="#303a3a" stroke-width="4"/>
+ <path d="M172 346L210 410L248 346L268 365L230 450H190L152 365Z" fill="#b3b0a2" opacity=".48"/>
+ <path d="M210 408V620" stroke="#293333" stroke-width="3" opacity=".5"/>
+ <path d="M126 382Q102 420 105 492L150 538Q177 545 183 520L166 430Z" fill="url(#skin)"/>
+ <path d="M294 382Q318 420 315 492L270 538Q243 545 237 520L254 430Z" fill="url(#skin)"/>
+ <path d="M107 493Q130 519 159 523M313 493Q290 519 261 523" stroke="#986b5e" stroke-width="3" fill="none"/>
  <!-- neck -->
- <path d="M565 260H635V320Q625 345 600 348Q575 345 565 320Z" fill="url(#skin)"/>
+ <path d="M178 270H242V355Q230 382 210 384Q190 382 178 355Z" fill="url(#skin)"/>
+ <!-- hair back -->
+ <path d="M126 205Q118 92 210 90Q310 86 296 220L291 355Q270 395 250 365L160 370Q130 355 124 300Z" fill="url(#hair)"/>
  <!-- ears -->
- <ellipse cx="516" cy="220" rx="17" ry="26" fill="#c58f78"/><ellipse cx="684" cy="220" rx="17" ry="26" fill="#c58f78"/>
+ <ellipse cx="132" cy="234" rx="16" ry="27" fill="#c88f78"/><ellipse cx="288" cy="234" rx="16" ry="27" fill="#c88f78"/>
  <!-- face -->
- <path d="M523 160Q530 115 600 115Q670 115 677 160L670 240Q655 285 600 295Q545 285 530 240Z" fill="url(#skin)" stroke="#9d6e60" stroke-width="2"/>
- <!-- hair cap and fringe -->
- <path d="M516 205Q495 125 550 93Q605 60 660 95Q710 130 684 220L667 185Q660 151 638 140Q600 160 555 139Q540 165 530 215Z" fill="url(#hair)"/>
- <path d="M540 142Q560 112 590 123Q620 134 647 115Q665 130 671 160Q640 150 622 157Q585 169 550 157Z" fill="#2a201e"/>
- <path d="M526 185Q512 245 545 286Q522 270 510 235Z" fill="#201b1b"/>
- <path d="M674 180Q691 245 656 286Q684 265 692 232Z" fill="#201b1b"/>
+ <path d="M139 166Q150 120 210 118Q270 120 281 166L274 260Q261 315 210 326Q159 315 146 260Z" fill="url(#skin)" stroke="#9d6f60" stroke-width="1.5"/>
+ <!-- cheek highlights -->
+ <ellipse cx="166" cy="258" rx="24" ry="15" fill="#f0b79d" opacity=".22"/><ellipse cx="254" cy="258" rx="24" ry="15" fill="#f0b79d" opacity=".22"/>
+ <!-- hairline and locks -->
+ <path d="M133 221Q108 137 166 104Q222 72 274 112Q315 148 290 238L273 196Q269 161 244 145Q207 164 169 144Q149 170 146 226Z" fill="url(#hair)"/>
+ <path d="M151 144Q175 111 203 127Q236 141 258 118Q280 134 282 167Q248 157 227 165Q187 176 153 160Z" fill="#2b211f"/>
+ <path d="M143 190Q128 276 163 318Q130 301 124 250ZM278 184Q299 275 259 320Q292 295 297 245Z" fill="#171517"/>
  <!-- eyebrows -->
- <path d="M550 204Q568 193 584 203M616 203Q635 193 651 204" stroke="#49332d" stroke-width="5" stroke-linecap="round" fill="none"/>
+ <path d="M164 218Q184 204 199 218M222 218Q240 204 258 218" stroke="#50372f" stroke-width="5" stroke-linecap="round" fill="none"/>
  <!-- eyes -->
- <path d="M550 220Q568 210 586 220Q568 232 550 220M614 220Q632 210 650 220Q632 232 614 220" fill="#f0e5d7"/>
- <ellipse cx="570" cy="220" rx="5" ry="7" fill="#3c3935"/><ellipse cx="630" cy="220" rx="5" ry="7" fill="#3c3935"/>
- <path d="M550 214Q568 207 586 216M614 216Q632 207 650 214" stroke="#3c2925" stroke-width="2" fill="none"/>
+ <path d="M163 235Q181 222 201 236Q183 249 163 235M219 236Q239 222 258 235Q239 249 219 236" fill="#f4e9df"/>
+ <ellipse cx="183" cy="236" rx="5" ry="7" fill="#51483e"/><ellipse cx="239" cy="236" rx="5" ry="7" fill="#51483e"/>
+ <circle cx="184" cy="235" r="2" fill="#171719"/><circle cx="240" cy="235" r="2" fill="#171719"/>
+ <path d="M163 229Q181 220 201 231M219 231Q239 220 258 229" stroke="#49332d" stroke-width="2" fill="none"/>
  <!-- nose -->
- <path d="M600 220L590 250Q600 258 610 250" stroke="#9d6e60" stroke-width="2.5" fill="none"/>
+ <path d="M210 238L201 272Q210 280 220 272" stroke="#a16e60" stroke-width="2.5" fill="none"/><ellipse cx="199" cy="276" rx="4" ry="2" fill="#8e5e55" opacity=".5"/><ellipse cx="221" cy="276" rx="4" ry="2" fill="#8e5e55" opacity=".5"/>
  <!-- mouth -->
- <path id="mouth" d="M578 270Q600 276 622 270" stroke="#854e4a" stroke-width="3" stroke-linecap="round" fill="none"/>
- <path d="M580 278Q600 282 620 278" stroke="#e2aa9a" stroke-width="2" fill="none" opacity=".6"/>
- <!-- hair strands -->
- <path d="M534 135Q522 180 530 220M552 105Q545 145 554 165M650 108Q665 150 660 175M675 140Q684 180 672 220" stroke="#695047" stroke-width="3" opacity=".45" fill="none"/>
+ <path id="mouth" d="M190 297Q210 287 230 297Q210 311 190 297Z" fill="#985b58"/><path d="M195 298Q210 302 225 298" stroke="#e7b4a3" stroke-width="2" fill="none"/>
+ <!-- fine face detail -->
+ <path d="M157 255Q164 266 176 268M263 255Q256 266 244 268" stroke="#a87366" stroke-width="1.4" opacity=".35" fill="none"/>
+ <path d="M157 173Q151 195 155 214M270 169Q277 195 272 215" stroke="#80604f" stroke-width="2" opacity=".35" fill="none"/>
+ <!-- small skin texture -->
+ <rect x="138" y="118" width="144" height="212" filter="url(#grain)" opacity=".2"/>
+ <!-- injury marks are subtle game-state overlays -->
+ <g id="marks" opacity="0">
+  <ellipse class="mark" cx="167" cy="260" rx="19" ry="11" fill="#754a5a" opacity="0"/>
+  <ellipse class="mark" cx="253" cy="260" rx="19" ry="11" fill="#754a5a" opacity="0"/>
+  <path class="mark" d="M247 275Q260 280 267 292" stroke="#8e4748" stroke-width="3" opacity="0" fill="none"/>
+  <path class="mark" d="M159 285Q170 290 177 300" stroke="#8e4748" stroke-width="2" opacity="0" fill="none"/>
+ </g>
 </g>
-<!-- table between player and suspect -->
-<path d="M260 490L940 490L1080 675H120L260 490Z" fill="url(#table)" stroke="#161c1e" stroke-width="7"/>
-<path d="M260 490L940 490" stroke="#a18c6c" stroke-width="5" opacity=".55"/>
-<path d="M300 520L900 520" stroke="#d4c3a1" stroke-width="2" opacity=".13"/>
-<!-- paper, recorder -->
-<rect x="780" y="535" width="120" height="75" rx="3" fill="#d5d0c1" transform="rotate(-5 780 535)" opacity=".8"/>
-<path d="M795 548L875 540M795 560L860 553M795 572L850 566" stroke="#77766d" stroke-width="2" opacity=".5"/>
-<rect x="330" y="540" width="86" height="48" rx="5" fill="#111719" stroke="#8b8c80" stroke-width="2"/>
-<circle cx="400" cy="564" r="6" fill="#9c4c43"/><circle cx="350" cy="564" r="3" fill="#c5b88f"/>
-<!-- player's forearms in POV -->
-<path d="M0 675L0 620Q60 570 180 570L260 675Z" fill="#b9846f" opacity=".95"/>
-<path d="M1200 675L1200 620Q1140 570 1020 570L940 675Z" fill="#b9846f" opacity=".95"/>
-<path d="M30 630Q100 590 165 600M1170 630Q1100 590 1035 600" stroke="#e0b39a" stroke-width="5" opacity=".35" fill="none"/>
-<!-- non-graphic injury overlay -->
-<g id="marks" opacity="0">
- <ellipse class="mark" cx="548" cy="240" rx="17" ry="10" fill="#6d4b62" opacity="0"/>
- <ellipse class="mark" cx="652" cy="241" rx="17" ry="10" fill="#6d4b62" opacity="0"/>
- <ellipse class="mark" cx="600" cy="286" rx="22" ry="8" fill="#80535a" opacity="0"/>
- <ellipse class="mark" cx="572" cy="317" rx="16" ry="6" fill="#8b5652" opacity="0"/>
- <ellipse class="mark" cx="630" cy="317" rx="16" ry="6" fill="#8b5652" opacity="0"/>
-</g>
-</svg>
-</div>
-<div id="counter">ДЕЙСТВИЯ<b id="count">0</b></div>
-<div id="hud"><div class="small">Отдел расследований · камера 04</div><h1>ДОПРОС</h1><div id="status">Подозреваемая · женщина · 28 лет</div></div>
-<div id="left" class="panel"><div class="caption">ВОЗДЕЙСТВИЕ</div>
-<button class="warn" onclick="act('slap')">ПОЩЁЧИНА<span class="sub">резкое действие</span></button>
-<button class="warn" onclick="act('punch')">УДАР КУЛАКОМ<span class="sub">сильный удар</span></button></div>
-<div id="right" class="panel"><div class="caption">ДРУГИЕ ДЕЙСТВИЯ</div>
-<button class="warn" onclick="act('hold')">ПРИДУШИТЬ<span class="sub">игровая анимация</span></button>
-<button class="gold" onclick="question()">ЗАДАТЬ ВОПРОС<span class="sub">продолжить допрос</span></button>
-<button id="reset" onclick="resetGame()">↻ ВЕРНУТЬ ОБРАЗ</button></div>
-<div id="bottom"><div id="speaker">ПОДОЗРЕВАЕМАЯ</div><div id="dialogue">«Я уже всё рассказала. Что ещё вам нужно?»</div></div>
-<div id="vignette"></div><div id="flash"></div>
-</div>
+<!-- table in foreground -->
+<path d="M0 642L420 642L470 900H-50Z" fill="url(#desk)" stroke="#181e20" stroke-width="7"/>
+<path d="M0 646H420" stroke="#b49b76" stroke-width="4" opacity=".5"/>
+<rect x="280" y="680" width="82" height="48" rx="3" fill="#d7d1c3" opacity=".8" transform="rotate(-7 280 680)"/>
+<path d="M292 693L347 686M292 704L338 698M292 715L330 709" stroke="#77766d" stroke-width="2" opacity=".5"/>
+<rect x="48" y="684" width="64" height="38" rx="5" fill="#101719" stroke="#9b9b8c" stroke-width="2"/><circle cx="96" cy="703" r="4" fill="#bd5147"/>
+<path d="M0 900V800Q45 755 112 770L155 900ZM420 900V800Q375 755 308 770L265 900Z" fill="#b77f6b" opacity=".85"/>
+</svg></div>
+<!-- fist/forearm animation, stylized and non-graphic -->
+<svg id="impact" viewBox="0 0 220 300"><defs><linearGradient id="arm" x2="0" y2="1"><stop stop-color="#d4a184"/><stop offset="1" stop-color="#8e5f50"/></linearGradient></defs><path d="M65 300Q72 210 92 135L78 105Q68 82 89 68Q105 58 118 77L131 56Q150 43 161 65L172 51Q192 49 194 73L200 100Q204 124 182 149L153 190L145 300Z" fill="url(#arm)" stroke="#754e43" stroke-width="5"/><path d="M86 104Q105 115 127 105M126 83Q143 100 164 91M160 74Q177 89 194 82" stroke="#f1c1a2" stroke-width="4" opacity=".45" fill="none"/></svg>
+<div id="counter">HARAKATLAR<b id="count">0</b></div><header id="top"><small>TERGOV BO‘LIMI · 04-XONA</small><strong>SO‘ROQ</strong></header>
+<div id="left" class="panel"><div class="cap">HARAKAT</div><button class="warn" onclick="act('slap')">SHAPALOQ<span class="sub">sahna animatsiyasi</span></button><button class="warn" onclick="act('punch')">MUSHT<span class="sub">sekin kadrlar</span></button></div>
+<div id="right" class="panel"><div class="cap">BOSHQA</div><button class="gold" onclick="question()">SAVOL BERISH<span class="sub">so‘roqni davom et</span></button><button onclick="toggleSound()" id="soundBtn">OVOZ: YOQIQ<span class="sub">ovozni boshqarish</span></button><button id="reset" onclick="resetGame()">↻ QAYTA BOSHLASH</button></div>
+<div id="hint">Harakatni tanlang · ovoz uchun ekranga teging</div>
+<section id="bottom"><div id="speaker">GUMONLanuvchi</div><div id="dialogue">«Men hammasini aytdim. Yana nimani bilmoqchisiz?»</div></section>
+<div id="vignette"></div><div id="flash"></div></main>
 <script>
-let hits=0, dialogueIndex=0, busy=false;
-const game=document.getElementById('game'), countEl=document.getElementById('count'), dialog=document.getElementById('dialogue'), speaker=document.getElementById('speaker'), statusEl=document.getElementById('status');
-const lines={
- slap:['«Хватит! Я не обязана отвечать на это!»','«Пожалуйста… дайте мне объяснить.»','«Я ничего не скрываю.»'],
- punch:['«Мне больно… остановитесь.»','«Я скажу, что знаю. Только прекратите.»','«Вы не получите правду таким способом.»'],
- hold:['«Отпустите меня!»','«Мне трудно дышать…»','«Хватит! Я отвечу на вопросы.»']
+let hits=0, q=0, busy=false, sound=true, audioCtx=null;
+const game=document.getElementById('game'),countEl=document.getElementById('count'),dialog=document.getElementById('dialogue'),speaker=document.getElementById('speaker'),woman=document.getElementById('woman');
+const speech={
+ slap:['«Bas qiling! Men bunday muomalaga loyiq emasman!»','«Iltimos, gapirishimga imkon bering.»','«Men sizdan hech narsani yashirmayapman.»'],
+ punch:['«Og‘riyapti… iltimos, to‘xtang.»','«Bilganlarimni aytaman, faqat bas qiling.»','«Bu yo‘l bilan haqiqatni topolmaysiz.»']
 };
+const questions=['«O‘sha kuni kechqurun uyda edim. Kameralarni tekshiring.»','«U paketni kim qoldirganini bilmayman.»','«Mayli… ko‘rganlarimni aytib beraman.»','«Menga advokat kerak.»'];
+function audio(type){
+ if(!sound)return;
+ try{
+  audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  const now=audioCtx.currentTime, osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+  osc.type=type==='voice'?'sine':'triangle';osc.frequency.setValueAtTime(type==='hit'?115:type==='slap'?190:330,now);osc.frequency.exponentialRampToValueAtTime(type==='hit'?48:type==='slap'?80:210,now+.16);
+  gain.gain.setValueAtTime(type==='voice'?.025:.16,now);gain.gain.exponentialRampToValueAtTime(.001,now+.22);osc.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+.23);
+ }catch(e){}
+}
+function say(text){
+ if(!sound||!('speechSynthesis' in window))return;
+ try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.lang='uz-UZ';u.rate=.91;u.pitch=.96;u.volume=.9;speechSynthesis.speak(u);}catch(e){}
+}
 function act(type){
- if(busy)return; busy=true; hits++; countEl.textContent=hits;
- const marks=document.querySelectorAll('#marks .mark');
- const idx=(hits-1)%marks.length; marks[idx].style.opacity=String(Math.min(.18+Math.ceil(hits/2)*.12,.72));
+ if(busy)return;busy=true;hits++;countEl.textContent=hits;
+ const marks=[...document.querySelectorAll('#marks .mark')],idx=Math.min(hits-1,marks.length-1);
+ marks.forEach((m,i)=>{if(i<=idx){m.style.opacity=String(.16+Math.min(i*.1,.28));}});
  document.getElementById('marks').setAttribute('opacity','1');
- const woman=document.getElementById('woman');
- woman.style.transform='translate('+(type==='slap'?(hits%2?'-7':'7'):type==='punch'?'0':'0')+'px,'+(type==='hold'?'-4':'2')+'px)';
- woman.style.transition='transform .16s';
- game.classList.add('shake','hit');
- document.getElementById('flash').animate([{opacity:.24},{opacity:0}],{duration:180});
- speaker.textContent=type==='slap'?'ПОЩЁЧИНА':type==='punch'?'УДАР':'ЗАХВАТ';
- dialog.textContent=lines[type][Math.min(Math.floor((hits-1)/2),2)];
- statusEl.textContent=hits>=7?'Состояние ухудшается · допрос прерван':hits>=3?'Подозреваемая напугана · напряжение растёт':'Подозреваемая · напряжена';
- setTimeout(()=>{game.classList.remove('shake','hit');woman.style.transform='';busy=false;},260);
- if(hits>=10){dialog.textContent='Допрос остановлен. Состояние подозреваемой требует медицинской помощи.';speaker.textContent='СИСТЕМА';}
+ game.classList.add('shake','hit','recoil');
+ const flash=document.getElementById('flash');flash.animate([{opacity:.2},{opacity:0}],{duration:260});
+ woman.animate(type==='punch'?[{transform:'translateY(0) rotate(0)'},{transform:'translate(-8px,4px) rotate(-2deg)'},{transform:'translate(5px,0) rotate(1deg)'},{transform:'none'}]:[{transform:'none'},{transform:'translate(10px,2px) rotate(1deg)'},{transform:'translate(-3px,0)'},{transform:'none'}],{duration:580,easing:'ease-out'});
+ document.getElementById('mouth').setAttribute('d','M190 297Q210 278 230 297Q210 319 190 297Z');
+ speaker.textContent=type==='slap'?'SHAPALOQ':'MUSHT BILAN ZARB';
+ const line=speech[type][Math.min(Math.floor((hits-1)/2),2)];dialog.textContent=line;audio(type==='punch'?'hit':'slap');say(line);
+ document.getElementById('hint').textContent='Sahna ijro etilmoqda…';
+ setTimeout(()=>{game.classList.remove('shake','hit','recoil');document.getElementById('mouth').setAttribute('d','M190 297Q210 287 230 297Q210 311 190 297Z');document.getElementById('hint').textContent='Harakatni tanlang';busy=false;},720);
+ if(hits>=7){setTimeout(()=>{speaker.textContent='TIZIM';dialog.textContent='So‘roq to‘xtatildi. Gumonlanuvchiga tibbiy yordam kerak.';},740);}
 }
-function question(){
- if(busy)return;
- const q=['«Я была дома в тот вечер. Проверьте камеры.»','«Я не знаю, кто оставил тот пакет.»','«Хорошо… я расскажу, что видела.»','«Мне нужен адвокат.»'];
- speaker.textContent='ДОПРОС';dialog.textContent=q[dialogueIndex%q.length];dialogueIndex++;
-}
-function resetGame(){
- hits=0;dialogueIndex=0;countEl.textContent='0';
- document.querySelectorAll('#marks .mark').forEach(m=>m.style.opacity='0');
- document.getElementById('marks').setAttribute('opacity','0');
- document.getElementById('woman').style.transform='';
- speaker.textContent='ПОДОЗРЕВАЕМАЯ';
- dialog.textContent='«Я уже всё рассказала. Что ещё вам нужно?»';
- statusEl.textContent='Подозреваемая · женщина · 28 лет';
-}
-</script>
-</body></html>
+function question(){if(busy)return;let line=questions[q++%questions.length];speaker.textContent='SO‘ROQ';dialog.textContent=line;audio('voice');say(line);}
+function toggleSound(){sound=!sound;document.getElementById('soundBtn').innerHTML='OVOZ: '+(sound?'YOQIQ':'O‘CHIQ')+'<span class="sub">ovozni boshqarish</span>';if(!sound&&'speechSynthesis'in window)speechSynthesis.cancel();}
+function resetGame(){hits=0;q=0;countEl.textContent='0';document.querySelectorAll('#marks .mark').forEach(m=>m.style.opacity='0');document.getElementById('marks').setAttribute('opacity','0');woman.getAnimations().forEach(a=>a.cancel());woman.style.transform='';document.getElementById('mouth').setAttribute('d','M190 297Q210 287 230 297Q210 311 190 297Z');speaker.textContent='GUMONLАNUVCHI';dialog.textContent='«Men hammasini aytdim. Yana nimani bilmoqchisiz?»';document.getElementById('hint').textContent='Harakatni tanlang';}
+</script></body></html>

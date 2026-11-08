@@ -1,18 +1,19 @@
-# So‘roq — 04-xona
+# So‘roq — 2D
 
-Android uchun vertikal (9:16) formatdagi birinchi shaxs so‘roq o‘yini.
+Android uchun vertikal formatdagi, birinchi shaxsdan boshqariladigan so‘roq o‘yini. Asosiy yo‘nalish yana **2D**: 3D prototip hozircha asosiy versiya emas.
 
-## Hozirgi versiya
-- Portret ekran: telefon uchun 9:16 kompozitsiya.
-- So‘roq xonasi va gumonlanuvchi SVG grafikasida qayta chizildi; teri, soch, kiyim va xona uchun ko‘p qatlamli soyalar hamda tekstura effektlari bor.
-- Shapaloq va musht harakatlari uchun qo‘l animatsiyasi, zarba paytidagi kamera silkinishi va qisqa yorug‘lik effekti.
-- O‘yin holatiga qarab o‘zgaradigan, grafik bo‘lmagan ko‘karish/qizarish izlari.
-- O‘zbekcha (lotin) matnlar va qurilmadagi Uzbek TTS mavjud bo‘lsa ovozli replikalar.
-- Web Audio orqali sintez qilingan qisqa effektlar; ovozni o‘chirish mumkin.
-- Qayta boshlash tugmasi.
+## 2D demo
+[Interaktiv 2D sahnani ochish](Interrogation2D/index.html)  
+[2D demo haqida](Interrogation2D/README.md)
 
-## APK
-GitHub Actions → Build Interrogation Game APK → InterrogationGame-debug artefaktini yuklab oling.
+## Rejalashtirilgan sifat
+- Realistik xona, stol, stul va yorug‘lik-soya
+- Gumonlanuvchining batafsil yuzi, sochi va kiyimi
+- Nafas olish, ko‘z qisish, bosh va qo‘l harakatlari
+- O‘zbekcha dialoglar, ovoz va vaziyatga mos javoblar
+- Vertikal mobil boshqaruv
 
-## Eslatma
- O‘zbekcha nutq qurilmada uz-UZ ovozi mavjud bo‘lsa eshittiriladi; ovoz bo‘lmasa matn ko‘rinadi. Hozirgi grafika vektor uslubidagi mobil prototip, fotorealistik 3D emas. APK hajmi ishlatilgan real rasm/audio resurslariga bog‘liq; sun’iy ravishda 50 MB gacha to‘ldirilmagan.
+## Hozirgi holat
+2D brauzer demosi qo‘shildi. Hozirgi qahramon procedural Canvas chizmasi; u hali fotorealistik personaj emas. Batafsil personaj rasmlari, boyroq animatsiyalar, yozib olingan o‘zbekcha ovozlar, to‘liq hikoya va Android APK yig‘ilishi hali bajarilishi kerak.
+
+Unity 3D tajriba fayllari `Unity3D/` ichida qoladi, ammo hozirgi asosiy yo‘nalish — 2D.

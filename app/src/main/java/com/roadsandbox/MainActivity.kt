@@ -71,7 +71,7 @@ class MainActivity : Activity() {
             insetTop = 1
             insetBottom = 1
             cornerRadius = 10
-            minHeight = 38
+            minimumHeight = 38
             setPadding(10, 0, 10, 0)
             setOnClickListener { action() }
         }

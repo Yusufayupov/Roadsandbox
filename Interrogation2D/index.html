@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#111317"><title>So‘roq — 2D</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101216;color:#eee;font-family:system-ui,-apple-system,sans-serif;touch-action:manipulation}
+#app{height:100dvh;display:flex;flex-direction:column;background:linear-gradient(#171a20,#0d0f13)}
+header{height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #30343b;background:#15181d;font-size:12px;letter-spacing:.12em;color:#c7cbd0}
+#scene{position:relative;flex:1;min-height:0;overflow:hidden;background:#292b2d}
+canvas{width:100%;height:100%;display:block}
+#caption{position:absolute;left:12px;right:12px;bottom:12px;background:#101216df;border:1px solid #42464d;border-radius:9px;padding:10px 12px;font-size:13px;line-height:1.4;min-height:52px;box-shadow:0 8px 24px #0008}
+#controls{flex:none;padding:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#111419;border-top:1px solid #30343b}
+button{border:1px solid #555b64;background:linear-gradient(#30353d,#20242a);color:#f1f2f3;border-radius:8px;padding:13px 8px;font-size:12px;font-weight:650;letter-spacing:.04em;min-height:48px}
+button:active{transform:scale(.98);background:#454c56}button.primary{border-color:#9a8057;background:linear-gradient(#66543b,#403526)}
+footer{height:22px;flex:none;text-align:center;color:#777e87;font-size:10px;padding:4px}
+</style></head>
+<body><div id="app">
+<header><span>SO‘ROQ • 02</span><span id="clock">21:43</span><span>TA’SIS BO‘LIMI</span></header>
+<main id="scene"><canvas id="view"></canvas><div id="caption">Siz tergov xonasidasiz. Gumonlanuvchi bilan suhbatni boshlang.</div></main>
+<section id="controls">
+<button class="primary" data-action="ask">SAVOL BERISH</button><button data-action="evidence">DALIL KO‘RSATISH</button>
+<button data-action="calm">TINCHLANTIRISH</button><button data-action="firm">QAT’IY OHANG</button>
+</section><footer>2D REALISTIK INTERAKTIV SAHNA • DEMO</footer></div>
+<script>
+(()=>{const c=document.getElementById('view'),ctx=c.getContext('2d'),caption=document.getElementById('caption');let W=0,H=0,t=0,mood=0,blink=0,action=0;
+function resize(){const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;c.width=W*d;c.height=H*d;ctx.setTransform(d,0,0,d,0,0)}new ResizeObserver(resize).observe(c);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function rr(x,y,w,h,r,col){ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function ellipse(x,y,rx,ry,col){ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fill()}
+function line(x1,y1,x2,y2,col,lw=1){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function draw(){if(!W||!H)return;t+=.016;const s=Math.min(W/390,H/650),ox=(W-390*s)/2,oy=(H-650*s)/2;ctx.save();ctx.translate(ox,oy);ctx.scale(s,s);
+const g=ctx.createLinearGradient(0,0,0,650);g.addColorStop(0,'#55524d');g.addColorStop(.55,'#393a39');g.addColorStop(1,'#222528');ctx.fillStyle=g;ctx.fillRect(0,0,390,650);
+// wall panels, ceiling light, corner shadows
+for(let x=0;x<390;x+=98){line(x,0,x,430,'#77736b22',2);line(x+2,0,x+2,430,'#17191b55',1)}
+rr(122,18,146,9,4,'#d9d0b7');ctx.fillStyle='#e8dfc4';ctx.globalAlpha=.17;ctx.fillRect(80,27,230,330);ctx.globalAlpha=1;
+rr(0,405,390,245,0,'#292725');for(let y=425;y<650;y+=28)line(0,y,390,y,'#71685d25',1);
+// table
+ctx.fillStyle='#171719';ctx.beginPath();ctx.moveTo(12,365);ctx.lineTo(378,365);ctx.lineTo(390,438);ctx.lineTo(0,438);ctx.fill();line(14,369,376,369,'#8c8170',2);rr(32,438,10,142,2,'#171719');rr(348,438,10,142,2,'#171719');
+// chair
+rr(102,236,186,174,25,'#24272b');rr(112,249,166,145,20,'#35383c');line(125,270,125,376,'#77716b33',2);line(266,270,266,376,'#111315',2);
+// shoulders / torso breathing
+const breathe=Math.sin(t*1.7)*2,shy=Math.sin(t*.53)*1.5;
+ctx.fillStyle='#26282b';ctx.beginPath();ctx.moveTo(91,650);ctx.lineTo(96,466);ctx.quadraticCurveTo(101,414,151,395);ctx.lineTo(239,395);ctx.quadraticCurveTo(289,414,294,466);ctx.lineTo(299,650);ctx.fill();
+const shirt=ctx.createLinearGradient(110,400,290,630);shirt.addColorStop(0,'#77716a');shirt.addColorStop(.5,'#4d4a47');shirt.addColorStop(1,'#292b2d');ctx.fillStyle=shirt;ctx.beginPath();ctx.moveTo(99,650);ctx.lineTo(103,471);ctx.quadraticCurveTo(110,424,157,405);ctx.lineTo(235,405);ctx.quadraticCurveTo(280,423,291,471);ctx.lineTo(295,650);ctx.fill();
+line(195,421,195,635,'#b5a99a22',1);line(140,445,122,600,'#d5c7b422',1);
+// neck
+rr(171,357+breathe,48,65,13,'#a97860');ellipse(195,357+breathe,24,13,'#bd8b70');
+// hair behind
+ctx.fillStyle='#211b19';ctx.beginPath();ctx.moveTo(137,205);ctx.quadraticCurveTo(125,100,196,93);ctx.quadraticCurveTo(270,96,257,220);ctx.lineTo(260,355);ctx.quadraticCurveTo(236,392,224,355);ctx.lineTo(153,360);ctx.quadraticCurveTo(128,339,137,205);ctx.fill();
+// ears and face
+ellipse(145,249,13,22,'#a97761');ellipse(245,249,13,22,'#a97761');
+const face=ctx.createRadialGradient(174,222,10,196,260,112);face.addColorStop(0,'#d6a587');face.addColorStop(1,'#98664f');ellipse(195+shy,248+breathe,51,75,face);
+// hair cap and side locks
+ctx.fillStyle='#28201d';ctx.beginPath();ctx.moveTo(144,230);ctx.quadraticCurveTo(133,140,191,132);ctx.quadraticCurveTo(251,128,248,222);ctx.quadraticCurveTo(224,190,214,177);ctx.quadraticCurveTo(184,202,147,204);ctx.fill();
+ctx.beginPath();ctx.moveTo(146,207);ctx.quadraticCurveTo(132,278,158,329);ctx.quadraticCurveTo(145,344,137,311);ctx.lineTo(132,235);ctx.fill();ctx.beginPath();ctx.moveTo(245,203);ctx.quadraticCurveTo(261,280,235,336);ctx.quadraticCurveTo(253,349,260,300);ctx.lineTo(258,224);ctx.fill();
+// brows, eyes blinking, nose, lips
+const eyeY=244+breathe*.15,eyeOpen=blink>0?Math.max(.08,1-blink*5):1;
+for(const ex of [176,215]){line(ex-10,eyeY-14,ex+9,eyeY-16,'#49312b',3);ellipse(ex,eyeY,9,4.5*eyeOpen,'#f0e4d7');ellipse(ex+1,eyeY,3.1,3.5*eyeOpen,'#302725');ellipse(ex+1,eyeY,1.4,2.5*eyeOpen,'#111')}
+line(196,250,190,272,'#805440',1.5);line(190,272,198,274,'#805440',1);
+line(184,291,195,294,'#74433e',1.7);line(195,294,207,290,'#74433e',1.7);line(185,292,205,292,'#e0a08c',1);
+// subtle skin details and worried expression
+line(166,225,181,221,'#6e493c55',1);line(207,221,222,225,'#6e493c55',1);ellipse(177,308,2,1,'#805b4d55');ellipse(215,309,2,1,'#805b4d55');
+// hands on table, fingers
+for(const x of [135,232]){ellipse(x,388+breathe,24,13,'#b9866c');for(let j=0;j<4;j++)line(x-13+j*7,390,x-14+j*7,402,'#7f5547',1)}
+// table evidence folder
+rr(24,376,74,7,2,'#b6a27f');rr(28,378,67,34,2,'#4a4034');line(32,385,87,385,'#c8b99a66',1);
+// overhead light and vignette
+const vg=ctx.createRadialGradient(195,280,80,195,280,390);vg.addColorStop(0,'#0000');vg.addColorStop(1,'#050608a8');ctx.fillStyle=vg;ctx.fillRect(0,0,390,650);
+ctx.restore();blink=Math.max(0,blink-.12);if(Math.random()<.012&&blink===0)blink=.2;requestAnimationFrame(draw)}
+requestAnimationFrame(draw);
+const lines={ask:'Gumonlanuvchi ko‘zlarini olib qochadi: “Men hammasini aytib berdim...”',evidence:'Siz dalilni stol ustiga qo‘ydingiz. U hujjatga uzoq tikilib qoldi.',calm:'Siz ovozingizni pasaytirdingiz. U biroz tinchlanib, sizga qaradi.',firm:'Siz qat’iy ohangda savol berdingiz. U bezovta bo‘lib, qo‘llarini qimirlatdi.'};
+document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;caption.textContent=lines[a];mood++;if(navigator.vibrate)navigator.vibrate(18);try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){const ac=new AC(),o=ac.createOscillator(),v=ac.createGain();o.frequency.value=a==='firm'?115:175;v.gain.setValueAtTime(.025,ac.currentTime);v.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.09);o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+.1)}}catch(e){}}));
+})();
+</script></body></html>

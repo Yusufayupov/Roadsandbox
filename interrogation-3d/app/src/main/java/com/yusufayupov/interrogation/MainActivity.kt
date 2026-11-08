@@ -16,7 +16,7 @@ class MainActivity : Activity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         window.statusBarColor = Color.rgb(13, 17, 23)
         window.navigationBarColor = Color.rgb(13, 17, 23)
-        setContentView(InterrogationView())
+        setContentView(InterrogationView(this))
     }
 }
 

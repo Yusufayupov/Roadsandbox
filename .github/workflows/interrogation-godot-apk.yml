@@ -1,0 +1,38 @@
+name: Build Interrogation 3D Godot APK
+
+on:
+  push:
+    paths:
+      - 'interrogation-godot/**'
+      - '.github/workflows/interrogation-godot-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Prepare Godot export templates
+        run: |
+          mkdir -p /root/.local/share/godot/export_templates
+          if [ -d /root/.local/share/godot/templates/4.4.1.stable ]; then
+            cp -a /root/.local/share/godot/templates/4.4.1.stable /root/.local/share/godot/export_templates/4.4.1.stable
+          fi
+          mkdir -p interrogation-godot/build
+      - name: Import project resources
+        run: godot --headless --editor --path interrogation-godot --quit
+      - name: Export Android APK
+        run: godot --headless --path interrogation-godot --export-debug "Android" interrogation-godot/build/Interrogation3D-debug.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Interrogation3D-Godot-APK
+          path: interrogation-godot/build/Interrogation3D-debug.apk
+          if-no-files-found: error
+          retention-days: 14

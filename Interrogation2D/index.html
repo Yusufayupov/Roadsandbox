@@ -19,7 +19,7 @@ footer{height:20px;flex:none;text-align:center;color:#777e87;font-size:9px;paddi
 <main id="scene"><canvas id="view"></canvas><div id="caption">Siz tergov xonasidasiz. Gumonlanuvchi bilan suhbatni boshlang.</div></main>
 <section id="controls">
 <button class="primary" data-action="ask">SAVOL BERISH</button><button data-action="evidence">DALIL KO‘RSATISH</button>
-<button data-action="calm">TINCHLANTIRISH</button><button data-action="firm">QAT’IY OHANG</button>
+<button data-action="calm">TINCHLANTIRISH</button><button data-action="firm">QAT’IY OHANG</button><button data-action="finish">YAKUNLASH</button><button data-action="reset">QAYTA BOSHLASH</button>
 </section><footer>2D INTERAKTIV SAHNA • ISHLAB CHIQILMOQDA</footer></div>
 <script>
 (()=> {
@@ -128,19 +128,65 @@ emotion=Math.max(0,emotion-dt*.035);mouth=Math.max(0,mouth-dt*.8);gaze+=(look-ga
 requestAnimationFrame(draw);
 }
 requestAnimationFrame(draw);
-const dialogue={
-ask:['Gumonlanuvchi ko‘zlarini olib qochadi: “Men hammasini aytib berdim...”','U chuqur nafas olib, savolingizni kutadi.','“Bu haqda gapirishni istamayman”, deydi u sekin.'],
-evidence:['Siz dalilni stol ustiga qo‘ydingiz. U hujjatga uzoq tikilib qoldi.','U suratga qarab, bir zum jim bo‘lib qoldi.','“Buni qayerdan oldingiz?” — deb so‘radi u.'],
-calm:['Siz ovozingizni pasaytirdingiz. U biroz tinchlanib, sizga qaradi.','U yelkasini bo‘shashtirib, gapirishga tayyorlanadi.','“Mayli, boshidan tushuntirib beraman”, deydi u.'],
-firm:['Siz qat’iy ohangda savol berdingiz. U bezovta bo‘lib, qo‘llarini qimirlatdi.','U qoshlarini chimirib, javob berishdan oldin sukut saqladi.','“Menga bosim o‘tkazmang”, deya javob qaytardi u.']
-};
-let counts={ask:0,evidence:0,calm:0,firm:0};
-document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
-const a=b.dataset.action,arr=dialogue[a];caption.textContent=arr[counts[a]++%arr.length];
-emotion=a==='calm'?.15:a==='firm'?.9:.55;look=a==='evidence'?-.65:a==='calm'?.25:.8;mouth=a==='ask'?.65:.2;
-if(navigator.vibrate)navigator.vibrate(a==='firm'?28:14);
-try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){const ac=new AC(),o=ac.createOscillator(),v=ac.createGain();o.type='sine';o.frequency.value=a==='firm'?112:a==='calm'?205:165;v.gain.setValueAtTime(.018,ac.currentTime);v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.12);o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+.13);o.onended=()=>ac.close()}}catch(e){}
-}));
+const caseState={trust:1,pressure:0,clues:[],questions:0,finished:false};
+const clueData=[
+ {title:'Kuzatuv kamerasi',text:'Kamera yozuvida gumonlanuvchi soat 21:12 da binoga qaytgani ko‘rinadi. U avval 20:50 da ketganini aytgandi.',reply:'“Men... vaqtni adashtirgan bo‘lishim mumkin”, deydi u kameradagi tasvirni ko‘rib.'},
+ {title:'Telefon qo‘ng‘iroqlari',text:'Telefon qaydlarida yo‘qolgan qurilmaga 21:18 da qo‘ng‘iroq qilingani ko‘rsatilgan.',reply:'U qo‘llarini bir-biriga qisadi: “Bu qo‘ng‘iroq haqida bilmayman...”'},
+ {title:'Topilgan buyum',text:'Stolga telefon g‘ilofi qo‘yiladi. U g‘ilofni ko‘rib, nigohini olib qochadi.',reply:'“G‘ilof meniki, lekin telefonni olganimni anglatmaydi”, deydi u past ovozda.'}
+];
+const questionLines=[
+ '“Siz binodan aynan qachon chiqdingiz?” — deb so‘raysiz. U javob berishdan oldin ikkilanadi.',
+ '“Nega kamera sizni 21:12 da qaytib kelganingizni ko‘rsatmoqda?” U ko‘zlarini olib qochadi.',
+ '“Telefon qo‘ng‘irog‘i haqida nima deya olasiz?” U chuqur nafas oladi.',
+ '“G‘ilof nima uchun sizning sumkangizdan topildi?” U uzoq sukut saqlaydi.'
+];
+function statusText(){return '\n\nISHONCH: '+caseState.trust+'/5   BOSIM: '+caseState.pressure+'/5   DALILLAR: '+caseState.clues.length+'/3';}
+function say(message){caption.textContent=message+statusText();}
+function finishCase(){
+ caseState.finished=true;
+ if(caseState.clues.length>=2&&caseState.questions>=2&&caseState.trust>=2){
+  say('U nihoyat boshini egadi: “Men telefonni oldim. Lekin uni sotmoqchi emasdim... Qo‘rqib, yolg‘on gapirdim.”\n\nTERGOV NATIJASI: IQROR OLINDI. Siz dalillarni to‘g‘ri tartibda ko‘rsatdingiz.');
+ }else if(caseState.clues.length>=2&&caseState.pressure>=3){
+  say('U suhbatni to‘xtatishni so‘raydi. Bosim kuchaydi, ammo ishonchli iqror olinmadi.\n\nTERGOV NATIJASI: NOANIQ. Keyingi safar avval dalillarni yig‘ing va xotirjam gaplashing.');
+ }else{
+  say('Suhbat yakunlandi, ammo xulosa chiqarish uchun dalillar yetarli emas.\n\nTERGOV NATIJASI: ISH OCHIQ QOLDI. Ko‘proq savol bering va dalillarni tekshiring.');
+ }
+ emotion=.25;look=-.4;mouth=.2;
+}
+function resetCase(){
+ caseState.trust=1;caseState.pressure=0;caseState.clues=[];caseState.questions=0;caseState.finished=false;
+ emotion=0;look=0;mouth=0;
+ say('Yangi tergov boshlandi. Gumonlanuvchi telefon yo‘qolgan kuni binoda bo‘lganini tan oladi, ammo uni olmaganini aytmoqda. Avval suhbatni boshlang.');
+}
+function handleAction(a){
+ if(a==='reset'){resetCase();return;}
+ if(caseState.finished){say('Tergov yakunlangan. Yangi urinish uchun QAYTA BOSHLASH tugmasini bosing.');return;}
+ if(a==='ask'){
+  const idx=Math.min(caseState.questions,questionLines.length-1);
+  caseState.questions++;
+  let extra=caseState.clues.length>=2?' “Men hammasini tushuntirib beraman...”':caseState.trust>=3?' “Sizga ishonishga harakat qilaman.”':' “Hozir javob berishga qiynalyapman.”';
+  say(questionLines[idx]+extra);
+  emotion=.55;look=.8;mouth=.65;
+ }else if(a==='evidence'){
+  const next=clueData.findIndex((_,i)=>!caseState.clues.includes(i));
+  if(next<0){say('Barcha uchta dalil ko‘rsatildi. Endi savollar bering va javoblarni solishtiring.');return;}
+  caseState.clues.push(next);
+  say('DALIL: '+clueData[next].title+'\n'+clueData[next].text+'\n\n'+clueData[next].reply);
+  emotion=.75;look=-.65;mouth=.2;
+ }else if(a==='calm'){
+  caseState.trust=Math.min(5,caseState.trust+1);caseState.pressure=Math.max(0,caseState.pressure-1);
+  say('Siz ovozingizni pasaytirib, unga suv taklif qilasiz. U yelkasini bo‘shashtiradi: “Mayli, savollaringizga javob beraman.”');
+  emotion=.15;look=.25;mouth=.25;
+ }else if(a==='firm'){
+  caseState.pressure=Math.min(5,caseState.pressure+1);caseState.trust=Math.max(0,caseState.trust-1);
+  say('Siz qat’iy ohangda dalillarni tushuntirasiz. U bezovtalanib, qo‘llarini bir-biriga qisadi: “Menga bosim o‘tkazmang.”');
+  emotion=.9;look=.8;mouth=.2;
+ }else if(a==='finish'){finishCase();return;}
+ if(navigator.vibrate)navigator.vibrate(a==='firm'?28:14);
+ try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){const ac=new AC(),o=ac.createOscillator(),v=ac.createGain();o.type='sine';o.frequency.value=a==='firm'?112:a==='calm'?205:165;v.gain.setValueAtTime(.018,ac.currentTime);v.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.12);o.connect(v);v.connect(ac.destination);o.start();o.stop(ac.currentTime+.13);o.onended=()=>ac.close()}}catch(e){}
+}
+document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>handleAction(b.dataset.action)));
+say('Tergov boshlandi. Gumonlanuvchi telefon yo‘qolgan kuni binoda bo‘lganini tan oladi, ammo uni olmaganini aytmoqda. Savol bering, dalillarni ko‘rsating va xotirjamlikni saqlang.');
 const clock=document.getElementById('clock');function tick(){clock.textContent=new Date().toLocaleTimeString('uz-UZ',{hour:'2-digit',minute:'2-digit'})}tick();setInterval(tick,30000);
 })();
 </script></body></html>

@@ -102,7 +102,8 @@ stroke([[165,229],[178,225]],'#855f4f44',1);stroke([[210,225],[224,229]],'#855f4
 ell(177,309,1.5,1,'#805b4d66');ell(215,309,1.5,1,'#805b4d66');
 // subtle forehead and skin marks
 for(let i=0;i<5;i++)ell(163+i*13,204+(i%2)*3,.6,.6,'#704e4055');
-ctx.restore();\n// hands resting on table
+ctx.restore();
+// hands resting on table
 for(const x of [137,232]){
 ell(x,389+breath,23,12,'#ae7c64');ell(x-3,386+breath,14,7,'#c18e73');
 for(let j=0;j<4;j++){stroke([[x-13+j*7,390+breath],[x-14+j*7,400+breath]],'#805849',.8);ell(x-13+j*7,391+breath,2,2,'#d5a48a')}

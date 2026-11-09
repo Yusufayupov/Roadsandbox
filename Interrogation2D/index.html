@@ -68,6 +68,8 @@ stroke([[116,454],[143,438],[164,432]],'#b8aa982b',2);stroke([[274,454],[248,438
 stroke([[195,420],[195,636]],'#c8b9a31b',1);stroke([[151,447],[132,590]],'#d7c8b51b',1);stroke([[239,447],[259,590]],'#11141655',1);
 // seams and fabric folds
 for(let i=0;i<7;i++)stroke([[116+i*5,485+i*10],[145+i*3,490+i*10]],'#d7c9b51a',1);
+// subtle head movement: small nods and tilts follow the suspect's emotional state
+ctx.save();ctx.translate(195+headX,248+breath);ctx.rotate(Math.sin(t*1.05)*.012+(nervous-.3)*.018);ctx.translate(-(195+headX),-(248+breath));
 // neck
 round(170+headX,350+breath,49,69,15,'#9e6e57');ell(195+headX,355+breath,24,13,'#c18c70');
 // hair mass behind head
@@ -100,7 +102,7 @@ stroke([[165,229],[178,225]],'#855f4f44',1);stroke([[210,225],[224,229]],'#855f4
 ell(177,309,1.5,1,'#805b4d66');ell(215,309,1.5,1,'#805b4d66');
 // subtle forehead and skin marks
 for(let i=0;i<5;i++)ell(163+i*13,204+(i%2)*3,.6,.6,'#704e4055');
-// hands resting on table
+ctx.restore();\n// hands resting on table
 for(const x of [137,232]){
 ell(x,389+breath,23,12,'#ae7c64');ell(x-3,386+breath,14,7,'#c18e73');
 for(let j=0;j<4;j++){stroke([[x-13+j*7,390+breath],[x-14+j*7,400+breath]],'#805849',.8);ell(x-13+j*7,391+breath,2,2,'#d5a48a')}
